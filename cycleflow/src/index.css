@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --mood-deep-teal: #2d8a8a;
+  --mood-sky-blue: #6da8d6;
+  --mood-sage-green: #8cae7e;
+  --mood-amber: #d39a47;
+  --mood-burnt-orange: #b76537;
+  --bg-color: var(--mood-deep-teal);
+  --accent-color: var(--mood-deep-teal);
+  --card-bg: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--bg-color) 14%, white) 0%, #eef2f7 40%);
+  color: var(--text-primary);
+  overscroll-behavior: none;
+}
