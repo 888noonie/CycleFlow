@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import EmojiPicker from './components/EmojiPicker'
 import MoodGrid from './components/MoodGrid'
 import EstrogenSlider from './components/EstrogenSlider'
+import FogSlider from './components/FogSlider'
 import QuickNote from './components/QuickNote'
 import SummaryView from './components/SummaryView'
 import ExportPanel from './components/ExportPanel'
@@ -16,14 +17,16 @@ function App() {
   const draft = useCycleStore((state) => state.draft)
   const entries = useCycleStore((state) => state.entries)
   const setDraftField = useCycleStore((state) => state.setDraftField)
-  const saveTodayEntry = useCycleStore((state) => state.saveTodayEntry)
+  const saveDraftEntry = useCycleStore((state) => state.saveDraftEntry)
   const hydrateDraftForToday = useCycleStore((state) => state.hydrateDraftForToday)
   const cycleStartDate = useCycleStore((state) => state.cycleStartDate)
   const setCycleStartDate = useCycleStore((state) => state.setCycleStartDate)
+  const activeDate = useCycleStore((state) => state.activeDate)
+  const setActiveDate = useCycleStore((state) => state.setActiveDate)
 
   const today = useMemo(() => format(new Date(), 'EEE, MMM d'), [])
   const recentEntries = entries.slice(0, 3)
-  const todayLine = `${format(new Date(), 'dd/MM/yyyy EEE')} | ${
+  const entryLine = `${format(new Date(activeDate), 'dd/MM/yyyy EEE')} | ${
     draft.symptoms?.join('') || '....'
   }`
 
@@ -69,6 +72,18 @@ function App() {
             className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700"
           />
         </div>
+        <div className="mt-2 flex items-center gap-2">
+          <label htmlFor="entry-date" className="text-xs font-semibold text-gray-700">
+            Editing day
+          </label>
+          <input
+            id="entry-date"
+            type="date"
+            value={activeDate}
+            onChange={(event) => setActiveDate(event.target.value)}
+            className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700"
+          />
+        </div>
       </header>
 
       <section className="flex-1 space-y-4 rounded-2xl bg-white p-4 shadow-sm">
@@ -85,23 +100,25 @@ function App() {
           value={draft.estrogen}
           onChange={(value) => setDraftField('estrogen', value)}
         />
+        <FogSlider value={draft.fog} onChange={(value) => setDraftField('fog', value)} />
         <QuickNote value={draft.note} onChange={(value) => setDraftField('note', value)} />
 
         <button
           type="button"
-          onClick={saveTodayEntry}
+          onClick={saveDraftEntry}
           className="w-full rounded-xl bg-teal-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800"
         >
-          Save today
+          Save selected day
         </button>
 
         <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
           <p className="font-semibold text-gray-800">Preview entry</p>
           <p className="mt-1">
-            {todayLine}
+            {entryLine}
           </p>
           <p className="mt-1">
             color {draft.color} | clarity {Math.round(draft.estrogen * 100)}%
+            {' | '}fog {Math.round((draft.fog ?? 0) * 100)}%
             {draft.note ? ` | "${draft.note}"` : ''}
           </p>
         </div>
@@ -115,7 +132,8 @@ function App() {
               {recentEntries.map((entry) => (
                 <li key={entry.id}>
                   {format(new Date(entry.date), 'dd/MM/yyyy EEE')} |{' '}
-                  {entry.symptoms?.join('') || entry.emoji} | {Math.round(entry.estrogen * 100)}%
+                  {entry.symptoms?.join('') || entry.emoji} | {Math.round(entry.estrogen * 100)}% |
+                  fog {Math.round((entry.fog ?? 0) * 100)}%
                 </li>
               ))}
             </ul>
@@ -123,9 +141,13 @@ function App() {
         </div>
       </section>
 
-      <SummaryView entries={entries} />
+      <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
 
-      <CycleOverlayChart entries={entries} cycleStartDate={cycleStartDate} />
+      <CycleOverlayChart
+        entries={entries}
+        cycleStartDate={cycleStartDate}
+        onApplySuggestedCycleStart={setCycleStartDate}
+      />
       <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
 
       <ExportPanel entries={entries} />

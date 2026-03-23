@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { format, subDays } from 'date-fns'
 
-function SummaryView({ entries }) {
+function SummaryView({ entries, activeDate, onSelectDate }) {
   const [selectedDate, setSelectedDate] = useState(null)
 
   const entriesByDate = useMemo(
@@ -47,9 +47,12 @@ function SummaryView({ entries }) {
             <button
               key={day.key}
               type="button"
-              onClick={() => setSelectedDate(day.key)}
+              onClick={() => {
+                setSelectedDate(day.key)
+                onSelectDate(day.key)
+              }}
               className={`h-9 rounded-md border text-[10px] font-medium transition ${
-                isSelected ? 'border-gray-900' : 'border-gray-200'
+                isSelected || activeDate === day.key ? 'border-gray-900' : 'border-gray-200'
               }`}
               style={{ backgroundColor: day.entry?.color ?? '#f3f4f6' }}
               title={format(day.date, 'MMM d')}

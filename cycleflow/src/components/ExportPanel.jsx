@@ -50,7 +50,8 @@ function exportTimeline({ entries, includeLegend }) {
     const symptomText = symptoms && symptoms.length > 0 ? symptoms : symptomFallback
 
     const noteSuffix = entry.note ? ` | "${entry.note}"` : ''
-    return `${format(dateObj, 'dd/MM/yyyy')} ${day}  | ${symptomText}${noteSuffix}`
+    const fogSuffix = entry.fog === undefined ? '' : ` | fog ${Math.round(entry.fog * 100)}%`
+    return `${format(dateObj, 'dd/MM/yyyy')} ${day}  | ${symptomText}${fogSuffix}${noteSuffix}`
   })
 
   return [startLine, '', legendBlock, legendBlock ? '' : '', ...lines].filter(Boolean).join('\n')

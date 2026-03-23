@@ -30,8 +30,9 @@ function defaultDraft(date = todayKey()) {
     date,
     emoji: '🫥',
     symptoms: [],
-    color: '#2d8a8a',
+    color: '#86d4c6',
     estrogen: 0.7,
+    fog: 0.4,
     note: '',
   }
 }
@@ -43,6 +44,7 @@ const useCycleStore = create(
       entries: [],
       draft: defaultDraft(),
       cycleStartDate: todayKey(),
+      activeDate: todayKey(),
 
       setDraftField: (field, value) =>
         set((state) => ({
@@ -50,33 +52,53 @@ const useCycleStore = create(
         })),
 
       setCycleStartDate: (value) => set(() => ({ cycleStartDate: value })),
-
-      hydrateDraftForToday: () =>
+      setActiveDate: (value) =>
         set((state) => {
-          const date = todayKey()
-          const existing = state.entries.find((entry) => entry.date === date)
+          const existing = state.entries.find((entry) => entry.date === value)
           if (!existing) {
-            return { draft: defaultDraft(date) }
+            return { activeDate: value, draft: defaultDraft(value) }
           }
-
           const symptoms = normalizeSymptoms(existing)
           return {
+            activeDate: value,
             draft: {
               ...existing,
               symptoms,
               emoji: primaryEmojiFromSymptoms(symptoms),
+              fog: existing.fog ?? 0.4,
             },
           }
         }),
 
-      saveTodayEntry: () =>
+      hydrateDraftForToday: () =>
         set((state) => {
-          const date = todayKey()
+          const date = state.activeDate || todayKey()
+          const existing = state.entries.find((entry) => entry.date === date)
+          if (!existing) {
+            return { draft: defaultDraft(date), activeDate: date }
+          }
+
+          const symptoms = normalizeSymptoms(existing)
+          return {
+            activeDate: date,
+            draft: {
+              ...existing,
+              symptoms,
+              emoji: primaryEmojiFromSymptoms(symptoms),
+              fog: existing.fog ?? 0.4,
+            },
+          }
+        }),
+
+      saveDraftEntry: () =>
+        set((state) => {
+          const date = state.activeDate || todayKey()
           const nextEntry = {
             ...state.draft,
             id: state.draft.id ?? date,
             symptoms: normalizeSymptoms(state.draft),
             emoji: primaryEmojiFromSymptoms(normalizeSymptoms(state.draft)),
+            fog: Number(state.draft.fog ?? 0.4),
             date,
             updatedAt: new Date().toISOString(),
           }
@@ -92,8 +114,15 @@ const useCycleStore = create(
           return {
             entries: nextEntries.sort((a, b) => b.date.localeCompare(a.date)),
             draft: nextEntry,
+            activeDate: date,
           }
         }),
+
+      saveTodayEntry: () => {
+        const today = todayKey()
+        get().setActiveDate(today)
+        get().saveDraftEntry()
+      },
 
       getEntryByDate: (date) => get().entries.find((entry) => entry.date === date),
     }),
@@ -105,6 +134,7 @@ const useCycleStore = create(
         schemaVersion: state.schemaVersion,
         entries: state.entries,
         cycleStartDate: state.cycleStartDate,
+        activeDate: state.activeDate,
       }),
       onRehydrateStorage: () => (state) => {
         state?.hydrateDraftForToday()

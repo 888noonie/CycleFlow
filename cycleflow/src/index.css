@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --mood-deep-teal: #2d8a8a;
-  --mood-sky-blue: #6da8d6;
-  --mood-sage-green: #8cae7e;
-  --mood-amber: #d39a47;
-  --mood-burnt-orange: #b76537;
-  --bg-color: var(--mood-deep-teal);
-  --accent-color: var(--mood-deep-teal);
+  --mood-low: #dcd3f6;
+  --mood-low-mid: #c8d7f3;
+  --mood-mid: #c6eadf;
+  --mood-mid-high: #aee3d4;
+  --mood-high: #86d4c6;
+  --bg-color: var(--mood-high);
+  --accent-color: var(--mood-high);
   --card-bg: #ffffff;
   --text-primary: #1f2937;
   --text-secondary: #4b5563;

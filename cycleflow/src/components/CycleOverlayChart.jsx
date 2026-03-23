@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { getCycleDay, getSymptomsText } from '../utils/cycle'
+import { getCycleDay, getSymptomsText, inferCycleStartDate } from '../utils/cycle'
 
 const OVULATION_DAY = 14
 
@@ -26,13 +26,22 @@ function markerYFromClarity(estrogen) {
   return 235 - clarity * 150
 }
 
-function CycleOverlayChart({ entries, cycleStartDate }) {
+function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart }) {
   const [selectedId, setSelectedId] = useState(null)
   const points = useMemo(
     () => buildPoints(entries, cycleStartDate),
     [entries, cycleStartDate]
   )
   const selected = points.find((point) => point.id === selectedId) ?? null
+  const inferred = useMemo(
+    () => inferCycleStartDate(entries, cycleStartDate),
+    [entries, cycleStartDate]
+  )
+  const todayKey = new Date().toISOString().slice(0, 10)
+  const currentCycleDay = getCycleDay(todayKey, cycleStartDate)
+  const inferredTodayCycleDay = getCycleDay(todayKey, inferred.suggestedCycleStartDate)
+  const activeCycleDay = inferredTodayCycleDay || currentCycleDay
+  const activeX = activeCycleDay ? 25 + ((activeCycleDay - 1) / 27) * 790 : null
 
   return (
     <section className="rounded-2xl bg-white p-4 shadow-sm">
@@ -93,6 +102,15 @@ function CycleOverlayChart({ entries, cycleStartDate }) {
             )
           })}
 
+          {activeX && (
+            <g>
+              <line x1={activeX} y1="35" x2={activeX} y2="265" stroke="#7c3aed" strokeDasharray="6 4" />
+              <text x={activeX - 18} y="48" fill="#6d28d9" fontSize="12" fontWeight="700">
+                You
+              </text>
+            </g>
+          )}
+
           {points.map((point) => {
             const x = 25 + ((point.cycleDay - 1) / 27) * 790
             const y = markerYFromClarity(point.estrogen)
@@ -117,6 +135,25 @@ function CycleOverlayChart({ entries, cycleStartDate }) {
             )
           })}
         </svg>
+      </div>
+
+      <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-900">
+        <p>
+          Best-fit cycle position estimate: Day {activeCycleDay ?? '?'} (model confidence:{' '}
+          {inferred.confidence}%)
+        </p>
+        <p className="mt-1">
+          Suggested cycle start: {inferred.suggestedCycleStartDate}{' '}
+          {inferred.suggestedCycleStartDate !== cycleStartDate && (
+            <button
+              type="button"
+              onClick={() => onApplySuggestedCycleStart(inferred.suggestedCycleStartDate)}
+              className="ml-2 rounded-md border border-indigo-300 bg-white px-2 py-0.5 text-[11px] font-semibold text-indigo-700"
+            >
+              Apply suggestion
+            </button>
+          )}
+        </p>
       </div>
 
       <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">

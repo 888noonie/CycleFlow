@@ -34,8 +34,7 @@ function AIHookPanel({ entries, cycleStartDate }) {
   )
 
   const openChatGPT = () => {
-    const encoded = encodeURIComponent(promptText)
-    window.open(`https://chatgpt.com/?q=${encoded}`, '_blank', 'noopener,noreferrer')
+    window.open('https://chatgpt.com/', '_blank', 'noopener,noreferrer')
   }
 
   const copyPrompt = async () => {
@@ -58,10 +57,13 @@ function AIHookPanel({ entries, cycleStartDate }) {
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={openChatGPT}
+          onClick={async () => {
+            await copyPrompt()
+            openChatGPT()
+          }}
           className="rounded-xl bg-indigo-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-800"
         >
-          Send to ChatGPT
+          Copy + Open ChatGPT
         </button>
         <button
           type="button"
@@ -75,6 +77,10 @@ function AIHookPanel({ entries, cycleStartDate }) {
       <pre className="mt-3 max-h-52 overflow-auto whitespace-pre-wrap rounded-xl border border-gray-200 bg-gray-50 p-3 text-[11px] leading-4 text-gray-700">
         {promptText}
       </pre>
+      <p className="mt-2 text-[11px] text-gray-500">
+        Prompt-in-URL is blocked by some ChatGPT flows, so this copies first and opens a new chat
+        reliably.
+      </p>
     </section>
   )
 }
