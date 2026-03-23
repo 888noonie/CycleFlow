@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import EmojiPicker from './components/EmojiPicker'
 import MoodGrid from './components/MoodGrid'
@@ -13,6 +13,12 @@ import AIHookPanel from './components/AIHookPanel'
 import PwaReadinessPanel from './components/PwaReadinessPanel'
 import useCycleStore from './store/useCycleStore'
 
+const THEME_STORAGE_KEY = 'cycleflow-theme-preference'
+
+function systemPrefersDark() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+}
+
 function App() {
   const draft = useCycleStore((state) => state.draft)
   const entries = useCycleStore((state) => state.entries)
@@ -23,6 +29,10 @@ function App() {
   const setCycleStartDate = useCycleStore((state) => state.setCycleStartDate)
   const activeDate = useCycleStore((state) => state.activeDate)
   const setActiveDate = useCycleStore((state) => state.setActiveDate)
+  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_STORAGE_KEY) || 'system')
+  const [resolvedTheme, setResolvedTheme] = useState(
+    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  )
 
   const today = useMemo(() => format(new Date(), 'EEE, MMM d'), [])
   const recentEntries = entries.slice(0, 3)
@@ -38,6 +48,32 @@ function App() {
     document.documentElement.style.setProperty('--bg-color', draft.color)
     document.documentElement.style.setProperty('--accent-color', draft.color)
   }, [draft.color])
+
+  useEffect(() => {
+    localStorage.setItem(THEME_STORAGE_KEY, theme)
+
+    const applyDark = (enabled) => {
+      document.documentElement.classList.toggle('dark', enabled)
+      document.documentElement.style.colorScheme = enabled ? 'dark' : 'light'
+      setResolvedTheme(enabled ? 'dark' : 'light')
+    }
+
+    if (theme === 'dark') {
+      applyDark(true)
+      return () => {}
+    }
+
+    if (theme === 'light') {
+      applyDark(false)
+      return () => {}
+    }
+
+    applyDark(systemPrefersDark())
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (event) => applyDark(event.matches)
+    media.addEventListener('change', handler)
+    return () => media.removeEventListener('change', handler)
+  }, [theme])
 
   const addSymptom = (emoji) => {
     const current = Array.isArray(draft.symptoms) ? draft.symptoms : []
@@ -55,38 +91,77 @@ function App() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm flex-col gap-4 px-4 py-6">
-      <header className="mb-4 rounded-2xl bg-white/90 p-4 shadow-sm">
-        <p className="text-sm font-medium text-gray-500">CycleFlow</p>
-        <h1 className="text-2xl font-semibold tracking-tight">Today</h1>
-        <p className="text-sm text-gray-600">{today}</p>
-        <div className="mt-3 flex items-center gap-2">
-          <label htmlFor="cycle-start" className="text-xs font-semibold text-gray-700">
-            Cycle start
-          </label>
-          <input
-            id="cycle-start"
-            type="date"
-            value={cycleStartDate}
-            onChange={(event) => setCycleStartDate(event.target.value)}
-            className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700"
-          />
+    <main className="mx-auto flex w-full max-w-sm flex-col gap-4 px-4 py-6 pb-safe pt-safe min-h-screen">
+      <header className="mb-2 rounded-2xl glass p-4 shadow-sm transition-all">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--card-border)] bg-white/90 text-2xl shadow-sm dark:bg-black/30">
+              🌺
+            </div>
+            <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">CycleFlow</p>
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Today</h1>
+            <p className="text-sm font-medium text-[var(--text-secondary)]">{today}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 rounded-xl border border-[var(--button-border)] bg-white/60 p-1 text-[11px] dark:border-white/10 dark:bg-black/20 shadow-sm">
+            {['light', 'dark', 'system'].map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setTheme(option)}
+                className={`rounded-lg px-2 py-1 font-semibold uppercase tracking-wide transition ${
+                  theme === option
+                    ? 'bg-teal-600 text-white dark:bg-teal-500'
+                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="mt-2 flex items-center gap-2">
-          <label htmlFor="entry-date" className="text-xs font-semibold text-gray-700">
-            Editing day
-          </label>
-          <input
-            id="entry-date"
-            type="date"
-            value={activeDate}
-            onChange={(event) => setActiveDate(event.target.value)}
-            className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700"
-          />
+
+        <div className="mt-3 rounded-xl border border-[var(--card-border)] bg-white/70 px-3 py-2 text-xs text-[var(--text-secondary)] shadow-sm dark:bg-black/20">
+          Gentle consistency beats intensity. Log a little today, and let patterns tell the story.
+        </div>
+
+        <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-[var(--text-secondary)]">
+          <span>Theme</span>
+          <span className="rounded-md border border-[var(--card-border)] px-2 py-0.5 uppercase">
+            pref: {theme} | active: {resolvedTheme}
+          </span>
+        </div>
+        
+        <div className="mt-4 flex flex-col gap-2">
+          <div className="flex items-center justify-between rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] p-3 px-4 transition-colors">
+            <label htmlFor="cycle-start" className="text-sm font-bold text-[var(--text-secondary)]">
+              Cycle start
+            </label>
+            <input
+              id="cycle-start"
+              type="date"
+              value={cycleStartDate}
+              onChange={(event) => setCycleStartDate(event.target.value)}
+              className="rounded-lg border-none bg-transparent text-sm font-black text-[var(--text-primary)] focus:ring-0 text-right cursor-pointer"
+            />
+          </div>
+          <div className="flex items-center justify-between rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] p-3 px-4 transition-colors">
+            <label htmlFor="entry-date" className="text-sm font-bold text-[var(--text-secondary)]">
+              Editing day
+            </label>
+            <input
+              id="entry-date"
+              type="date"
+              value={activeDate}
+              onChange={(event) => setActiveDate(event.target.value)}
+              className="rounded-lg border-none bg-transparent text-sm font-black text-[var(--text-primary)] focus:ring-0 text-right cursor-pointer"
+            />
+          </div>
         </div>
       </header>
 
-      <section className="flex-1 space-y-4 rounded-2xl bg-white p-4 shadow-sm">
+      <section className="flex-1 space-y-8 rounded-[2rem] smooth-card p-6 shadow-xl">
         <EmojiPicker
           selectedEmojis={draft.symptoms ?? []}
           onAdd={addSymptom}
@@ -106,53 +181,59 @@ function App() {
         <button
           type="button"
           onClick={saveDraftEntry}
-          className="w-full rounded-xl bg-teal-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800"
+          className="w-full rounded-[1.5rem] bg-[var(--accent-color)] px-6 py-5 text-lg font-black tracking-wide text-white shadow-lg shadow-[var(--accent-color)]/20 border border-[var(--button-border)] transition-all hover:opacity-90 active:scale-[0.97]"
         >
-          Save selected day
+          SAVE SELECTED DAY
         </button>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
-          <p className="font-semibold text-gray-800">Preview entry</p>
-          <p className="mt-1">
-            {entryLine}
-          </p>
-          <p className="mt-1">
-            color {draft.color} | clarity {Math.round(draft.estrogen * 100)}%
-            {' | '}fog {Math.round((draft.fog ?? 0) * 100)}%
-            {draft.note ? ` | "${draft.note}"` : ''}
-          </p>
-        </div>
+        <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-white/5">
+          <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">Preview entry</h3>
+            <p className="mt-3 text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
+              {entryLine}
+            </p>
+            <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              color {draft.color} | clarity {Math.round(draft.estrogen * 100)}%
+              {' | '}fog {Math.round((draft.fog ?? 0) * 100)}%
+              {draft.note ? ` | "${draft.note}"` : ''}
+            </p>
+          </div>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
-          <p className="font-semibold text-gray-800">Recent entries ({entries.length})</p>
-          {recentEntries.length === 0 ? (
-            <p className="mt-1 text-gray-600">No saved entries yet.</p>
-          ) : (
-            <ul className="mt-1 space-y-1">
-              {recentEntries.map((entry) => (
-                <li key={entry.id}>
-                  {format(new Date(entry.date), 'dd/MM/yyyy EEE')} |{' '}
-                  {entry.symptoms?.join('') || entry.emoji} | {Math.round(entry.estrogen * 100)}% |
-                  fog {Math.round((entry.fog ?? 0) * 100)}%
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">Recent entries ({entries.length})</h3>
+            {recentEntries.length === 0 ? (
+              <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">No saved entries yet.</p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {recentEntries.map((entry) => (
+                  <li key={entry.id} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <span className="w-16 font-black text-gray-400 dark:text-gray-500">{format(new Date(entry.date), 'dd/MM')}</span>
+                    <span className="text-xl tracking-widest">{entry.symptoms?.join('') || entry.emoji}</span>
+                    <span className="ml-auto font-mono font-bold">{Math.round(entry.estrogen * 100)}%</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </section>
 
-      <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
+      <div className="space-y-6 pb-12">
+        <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
 
-      <CycleOverlayChart
-        entries={entries}
-        cycleStartDate={cycleStartDate}
-        onApplySuggestedCycleStart={setCycleStartDate}
-      />
-      <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
+        <CycleOverlayChart
+          entries={entries}
+          cycleStartDate={cycleStartDate}
+          onApplySuggestedCycleStart={setCycleStartDate}
+        />
+        <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
 
-      <ExportPanel entries={entries} />
-      <AIHookPanel entries={entries} cycleStartDate={cycleStartDate} />
-      <PwaReadinessPanel />
+        <div className="grid grid-cols-1 gap-4">
+          <ExportPanel entries={entries} />
+          <AIHookPanel entries={entries} cycleStartDate={cycleStartDate} />
+          <PwaReadinessPanel />
+        </div>
+      </div>
     </main>
   )
 }

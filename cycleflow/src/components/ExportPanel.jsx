@@ -59,6 +59,8 @@ function exportTimeline({ entries, includeLegend }) {
 
 function ExportPanel({ entries }) {
   const [includeLegend, setIncludeLegend] = useState(true)
+  const [copied, setCopied] = useState(false)
+  
   const timelineText = useMemo(
     () => exportTimeline({ entries, includeLegend }),
     [entries, includeLegend]
@@ -67,9 +69,9 @@ function ExportPanel({ entries }) {
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(timelineText)
-      alert('Copied timeline to clipboard.')
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Fallback: select via a temporary textarea.
       const textarea = document.createElement('textarea')
       textarea.value = timelineText
       textarea.style.position = 'fixed'
@@ -78,7 +80,8 @@ function ExportPanel({ entries }) {
       textarea.select()
       document.execCommand('copy')
       document.body.removeChild(textarea)
-      alert('Copied timeline to clipboard.')
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
   }
 
@@ -95,46 +98,52 @@ function ExportPanel({ entries }) {
   }
 
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold text-gray-900">Export / Share</h2>
-          <p className="mt-1 text-xs text-gray-500">
+    <section className="smooth-card space-y-4 rounded-[2rem] p-6 shadow-xl">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Export / Share</h2>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-snug">
             Generates a plain-text timeline like the Bearable-style logs.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 text-xs text-gray-700">
-            <input
-              type="checkbox"
-              checked={includeLegend}
-              onChange={(e) => setIncludeLegend(e.target.checked)}
-            />
-            Legend
-          </label>
-        </div>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="w-5 h-5 rounded-md border-gray-300 text-teal-600 focus:ring-teal-500 transition-all dark:bg-gray-800 dark:border-gray-700"
+            checked={includeLegend}
+            onChange={(e) => setIncludeLegend(e.target.checked)}
+          />
+          <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest">Legend</span>
+        </label>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="flex gap-3">
         <button
           type="button"
           onClick={onCopy}
-          className="rounded-xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800"
+          className={`flex-1 rounded-2xl px-4 py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 shadow-md border border-[var(--button-border)] ${
+            copied 
+            ? 'bg-green-600 text-white shadow-green-500/20' 
+            : 'bg-teal-600 text-white shadow-teal-500/20 dark:bg-teal-500'
+          }`}
         >
-          Copy
+          {copied ? 'COPIED!' : 'COPY'}
         </button>
         <button
           type="button"
           onClick={onDownload}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50"
+          className="flex-1 rounded-2xl border border-gray-200 bg-white px-4 py-4 text-sm font-black uppercase tracking-widest text-gray-900 shadow-sm transition-all hover:bg-gray-50 active:scale-95 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
         >
           Download .txt
         </button>
       </div>
 
-      <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap rounded-xl border border-gray-200 bg-gray-50 p-3 text-[11px] leading-4 text-gray-700">
-        {timelineText}
-      </pre>
+      <div className="relative group">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/5 to-transparent pointer-events-none rounded-2xl dark:from-white/5" />
+        <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 text-[11px] font-mono leading-relaxed text-gray-700 shadow-inner dark:border-white/10 dark:bg-black/30 dark:text-gray-300">
+          {timelineText}
+        </pre>
+      </div>
     </section>
   )
 }

@@ -36,13 +36,18 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
   }
 
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-sm">
-      <h2 className="text-base font-semibold text-gray-900">30-day summary</h2>
-      <p className="mt-1 text-xs text-gray-500">Tap a day to see details.</p>
+    <section className="smooth-card space-y-4 rounded-[2rem] p-5">
+      <div>
+        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">30-day summary</h2>
+        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">Tap a day to see details.</p>
+      </div>
 
-      <div className="mt-3 grid grid-cols-6 gap-2">
+      <div className="grid grid-cols-6 gap-2 sm:gap-3 rounded-2xl bg-gray-50/50 p-3 shadow-inner ring-1 ring-gray-900/5 dark:bg-black/20 dark:ring-white/10">
         {days.map((day) => {
           const isSelected = selectedDate === day.key
+          const isDraft = activeDate === day.key
+          const hasEntry = !!day.entry
+          
           return (
             <button
               key={day.key}
@@ -51,10 +56,12 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
                 setSelectedDate(day.key)
                 onSelectDate(day.key)
               }}
-              className={`h-9 rounded-md border text-[10px] font-medium transition ${
-                isSelected || activeDate === day.key ? 'border-gray-900' : 'border-gray-200'
-              }`}
-              style={{ backgroundColor: day.entry?.color ?? '#f3f4f6' }}
+              className={`flex aspect-square items-center justify-center rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-90 ${
+                isSelected || isDraft
+                  ? 'ring-2 ring-gray-900 ring-offset-1 scale-105 shadow-md dark:ring-gray-100 dark:ring-offset-gray-900'
+                  : 'ring-1 ring-black/5 hover:scale-105 hover:shadow-sm dark:ring-white/10'
+              } ${hasEntry ? 'text-gray-900' : 'text-gray-500 dark:text-gray-400'}`}
+              style={{ backgroundColor: day.entry?.color ?? 'var(--card-bg)' }}
               title={format(day.date, 'MMM d')}
               aria-label={`Summary day ${format(day.date, 'MMM d')}`}
             >
@@ -64,23 +71,32 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
         })}
       </div>
 
-      <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
+      <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-4 shadow-sm dark:border-white/10 dark:bg-white/5 text-sm text-gray-700 dark:text-gray-300">
         {selectedDate && selectedEntry ? (
-          <p>
-            {selectedEntry.date}: {symptomLine(selectedEntry)} |{' '}
-            {Math.round(selectedEntry.estrogen * 100)}% clarity
-            {selectedEntry.note ? ` | "${selectedEntry.note}"` : ''}
-          </p>
+          <div className="space-y-1">
+            <p className="font-semibold">{selectedEntry.date}</p>
+            <p className="text-lg tracking-widest">{symptomLine(selectedEntry)}</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {Math.round(selectedEntry.estrogen * 100)}% clarity
+              {selectedEntry.note ? ` | "${selectedEntry.note}"` : ''}
+            </p>
+          </div>
         ) : selectedDate ? (
-          <p>{selectedDate}: no entry saved.</p>
+          <p className="font-medium">{selectedDate}: no entry saved.</p>
         ) : (
-          <p>Select a day in the grid for details.</p>
+          <p className="text-gray-500 dark:text-gray-400">Select a day in the grid for details.</p>
         )}
       </div>
 
-      <div className="mt-2 text-xs text-gray-600">
-        <p>Logged days (30d): {days.filter((day) => day.entry).length}/30</p>
-        <p>Avg clarity (7d): {avgClarity === null ? 'No data yet' : `${avgClarity}%`}</p>
+      <div className="flex flex-col gap-1 text-sm font-medium text-gray-600 dark:text-gray-400">
+        <div className="flex justify-between">
+          <span>Logged days (30d)</span>
+          <span className="text-gray-900 dark:text-gray-100">{days.filter((day) => day.entry).length}/30</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Avg clarity (7d)</span>
+          <span className="text-gray-900 dark:text-gray-100">{avgClarity === null ? 'No data yet' : `${avgClarity}%`}</span>
+        </div>
       </div>
     </section>
   )

@@ -44,29 +44,34 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
   const activeX = activeCycleDay ? 25 + ((activeCycleDay - 1) / 27) * 790 : null
 
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-sm">
-      <h2 className="text-base font-semibold text-gray-900">Cycle map with emoji overlays</h2>
-      <p className="mt-1 text-xs text-gray-500">
-        Fixed 28-day view. Tap markers to inspect notes and symptom stacks.
-      </p>
+    <section className="smooth-card space-y-4 rounded-[2rem] p-5">
+      <div>
+        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Cycle map with emoji overlays</h2>
+        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+          Fixed 28-day view. Tap markers to inspect notes and symptom stacks.
+        </p>
+      </div>
 
-      <div className="mt-3 overflow-x-auto rounded-xl border border-gray-200 bg-gray-50 p-2">
-        <svg viewBox="0 0 840 300" className="h-auto min-w-[700px]">
-          <rect x="0" y="0" width="840" height="300" fill="#f8fafc" />
-          <rect x="0" y="30" width="420" height="235" fill="#eef2ff" />
-          <rect x="420" y="30" width="420" height="235" fill="#eff6ff" />
+      <div className="mt-2 overflow-x-auto rounded-[1.5rem] border border-gray-200/60 bg-white/50 p-3 shadow-inner dark:border-white/10 dark:bg-black/20">
+        <svg viewBox="0 0 840 300" className="h-auto min-w-[700px] drop-shadow-sm">
+          <rect x="0" y="0" width="840" height="300" fill="transparent" />
+          <rect x="0" y="30" width="420" height="235" fill="rgba(99, 102, 241, 0.05)" />
+          <rect x="420" y="30" width="420" height="235" fill="rgba(59, 130, 246, 0.05)" />
 
-          <text x="120" y="24" fill="#334155" fontSize="18" fontWeight="700">
+          <text x="120" y="24" fill="currentColor" className="text-gray-400 dark:text-gray-500" fontSize="18" fontWeight="700">
             FOLLICULAR PHASE
           </text>
-          <text x="535" y="24" fill="#334155" fontSize="18" fontWeight="700">
+          <text x="535" y="24" fill="currentColor" className="text-gray-400 dark:text-gray-500" fontSize="18" fontWeight="700">
             LUTEAL PHASE
           </text>
 
-          <line x1="420" y1="30" x2="420" y2="265" stroke="#ef4444" strokeWidth="3" />
-          <text x="387" y="286" fill="#b91c1c" fontSize="13" fontWeight="700">
-            Ovulation (Day 14)
-          </text>
+          <line x1="420" y1="30" x2="420" y2="255" stroke="#ef4444" strokeWidth="4" opacity="0.4" />
+          <g transform="translate(420, 275)">
+            <rect x="-45" y="-12" width="90" height="24" rx="12" fill="#ef4444" />
+            <text x="0" y="5" fill="white" fontSize="12" fontWeight="900" textAnchor="middle" className="uppercase tracking-widest">
+              OVULATION
+            </text>
+          </g>
 
           {/* Estrogen-like curve */}
           <path
@@ -74,6 +79,7 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
             fill="none"
             stroke="#ec4899"
             strokeWidth="4"
+            opacity="0.6"
           />
           {/* LH-like spike */}
           <path
@@ -81,6 +87,7 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
             fill="none"
             stroke="#22c55e"
             strokeWidth="4"
+            opacity="0.6"
           />
           {/* Progesterone-like luteal hump */}
           <path
@@ -88,14 +95,15 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
             fill="none"
             stroke="#3b82f6"
             strokeWidth="4"
+            opacity="0.6"
           />
 
           {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => {
             const x = 25 + ((day - 1) / 27) * 790
             return (
               <g key={`tick-${day}`}>
-                <line x1={x} y1="265" x2={x} y2="272" stroke="#64748b" strokeWidth="1" />
-                <text x={x - 5} y="288" fill="#475569" fontSize="11">
+                <line x1={x} y1="265" x2={x} y2="272" stroke="currentColor" className="text-gray-300 dark:text-gray-700" strokeWidth="1" />
+                <text x={x - 5} y="288" fill="currentColor" className="text-gray-400 dark:text-gray-500 font-bold" fontSize="11">
                   {day}
                 </text>
               </g>
@@ -104,9 +112,10 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
 
           {activeX && (
             <g>
-              <line x1={activeX} y1="35" x2={activeX} y2="265" stroke="#7c3aed" strokeDasharray="6 4" />
-              <text x={activeX - 18} y="48" fill="#6d28d9" fontSize="12" fontWeight="700">
-                You
+              <line x1={activeX} y1="35" x2={activeX} y2="265" stroke="#7c3aed" strokeDasharray="6 4" strokeWidth="2" />
+              <rect x={activeX - 25} y="38" width="50" height="20" rx="4" fill="#7c3aed" />
+              <text x={activeX - 12} y="52" fill="white" fontSize="12" fontWeight="700">
+                YOU
               </text>
             </g>
           )}
@@ -114,57 +123,56 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
           {points.map((point) => {
             const x = 25 + ((point.cycleDay - 1) / 27) * 790
             const y = markerYFromClarity(point.estrogen)
+            const isSelected = selectedId === point.id
             return (
-              <g key={point.id} onClick={() => setSelectedId(point.id)} className="cursor-pointer">
+              <g key={point.id} onClick={() => setSelectedId(point.id)} className="cursor-pointer group">
                 <circle
                   cx={x}
                   cy={y}
-                  r={selectedId === point.id ? 15 : 12}
+                  r={isSelected ? 18 : 15}
                   fill={point.color || '#0f766e'}
-                  stroke="#0f172a"
-                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className={`${isSelected ? 'text-gray-900 dark:text-white' : 'text-white/20 dark:text-black/20'}`}
+                  strokeWidth="2"
                 />
-                <text x={x - 11} y={y + 5} fontSize="13">
+                <text x={x - 13} y={y + 6} fontSize="16" className="pointer-events-none select-none">
                   {point.emoji ?? '🫥'}
                 </text>
-                <title>
-                  {point.date} | Day {point.cycleDay} | {point.symptomsText}
-                  {point.note ? ` | ${point.note}` : ''}
-                </title>
               </g>
             )
           })}
         </svg>
       </div>
 
-      <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-900">
-        <p>
-          Best-fit cycle position estimate: Day {activeCycleDay ?? '?'} (model confidence:{' '}
-          {inferred.confidence}%)
+      <div className="rounded-2xl border border-indigo-200/50 bg-indigo-50/50 p-4 shadow-sm dark:border-indigo-900/30 dark:bg-indigo-900/10">
+        <p className="text-sm font-bold text-indigo-900 dark:text-indigo-200">
+          Best-fit cycle position: Day {activeCycleDay ?? '?'}
         </p>
-        <p className="mt-1">
-          Suggested cycle start: {inferred.suggestedCycleStartDate}{' '}
-          {inferred.suggestedCycleStartDate !== cycleStartDate && (
-            <button
-              type="button"
-              onClick={() => onApplySuggestedCycleStart(inferred.suggestedCycleStartDate)}
-              className="ml-2 rounded-md border border-indigo-300 bg-white px-2 py-0.5 text-[11px] font-semibold text-indigo-700"
-            >
-              Apply suggestion
-            </button>
-          )}
+        <p className="mt-1 text-xs font-medium text-indigo-800/70 dark:text-indigo-300/60">
+          Model confidence: {inferred.confidence}% | Suggested start: {inferred.suggestedCycleStartDate}
         </p>
+        {inferred.suggestedCycleStartDate !== cycleStartDate && (
+          <button
+            type="button"
+            onClick={() => onApplySuggestedCycleStart(inferred.suggestedCycleStartDate)}
+            className="mt-3 rounded-xl bg-white px-4 py-2 text-xs font-bold text-indigo-700 shadow-sm transition-all active:scale-95 dark:bg-indigo-800 dark:text-indigo-100"
+          >
+            Apply Suggestion
+          </button>
+        )}
       </div>
 
-      <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
+      <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-4 shadow-sm dark:border-white/10 dark:bg-white/5 text-sm text-gray-700 dark:text-gray-300 min-h-[4.5rem] flex items-center">
         {selected ? (
-          <p>
-            {format(parseISO(selected.date), 'dd/MM/yyyy EEE')} | Cycle day {selected.cycleDay} |{' '}
-            {selected.symptomsText}
-            {selected.note ? ` | "${selected.note}"` : ''}
-          </p>
+          <div className="space-y-1">
+            <p className="font-bold text-gray-900 dark:text-gray-100">
+              {format(parseISO(selected.date), 'dd/MM/yyyy EEE')} | Cycle day {selected.cycleDay}
+            </p>
+            <p className="text-lg tracking-widest">{selected.symptomsText}</p>
+            {selected.note && <p className="italic text-gray-500 dark:text-gray-400">"{selected.note}"</p>}
+          </div>
         ) : (
-          <p>Select an overlay marker to read notes and symptom details.</p>
+          <p className="font-medium text-gray-500 dark:text-gray-400 italic">Select an overlay marker to read notes and symptom details.</p>
         )}
       </div>
     </section>
