@@ -12,6 +12,7 @@ The app is designed for people who want fast daily logging (emoji symptom stacks
 - Cycle Lens mode for cross-cycle day clustering
 - Brain fog and clarity sliders
 - Export/share text timeline for clinicians or support teams
+- Import + merge timeline flow (helps migrate data between Safari and Home Screen app contexts)
 - ChatGPT handoff prompt generator
 - Light/Dark/System theme toggle
 - Installable PWA (iPhone Safari Add to Home Screen)
@@ -61,6 +62,17 @@ When importing this repo in Vercel, use:
 2. Tap Share.
 3. Tap Add to Home Screen.
 4. Launch from the home icon.
+
+## Data migration tip (Safari vs Home Screen)
+
+iOS can sometimes keep Safari-tab storage separate from Home Screen app storage.
+
+If data appears in Safari but not in the installed icon app:
+
+1. Open Safari version with your existing data.
+2. Go to `Export / Share` and copy the timeline text.
+3. Open Home Screen app and use `Import timeline` in the same panel.
+4. Tap `Import + Merge` to bring entries across.
 
 ## Notes
 

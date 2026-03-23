@@ -57,9 +57,45 @@ function exportTimeline({ entries, includeLegend }) {
   return [startLine, '', legendBlock, legendBlock ? '' : '', ...lines].filter(Boolean).join('\n')
 }
 
-function ExportPanel({ entries }) {
+function parseImportedTimeline(text) {
+  const lines = text.split(/\r?\n/)
+  const results = []
+  const lineRegex = /^(\d{2})\/(\d{2})\/(\d{4})\s+\w{3}\s+\|\s*(.+)$/
+
+  for (const line of lines) {
+    const match = line.trim().match(lineRegex)
+    if (!match) {
+      continue
+    }
+
+    const [, dd, mm, yyyy, payload] = match
+    const date = `${yyyy}-${mm}-${dd}`
+
+    const parts = payload.split('|').map((part) => part.trim()).filter(Boolean)
+    const first = parts[0] ?? ''
+    const fogPart = parts.find((part) => /^fog\s+\d+%$/i.test(part))
+    const notePart = parts.find((part) => part.startsWith('"') && part.endsWith('"'))
+
+    const fog = fogPart ? Number(fogPart.replace(/[^\d]/g, '')) / 100 : undefined
+    const note = notePart ? notePart.slice(1, -1) : ''
+
+    results.push({
+      id: date,
+      date,
+      symptoms: first,
+      fog,
+      note,
+    })
+  }
+
+  return results
+}
+
+function ExportPanel({ entries, onImportEntries }) {
   const [includeLegend, setIncludeLegend] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importMessage, setImportMessage] = useState('')
   
   const timelineText = useMemo(
     () => exportTimeline({ entries, includeLegend }),
@@ -95,6 +131,16 @@ function ExportPanel({ entries }) {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const onImport = () => {
+    const parsed = parseImportedTimeline(importText)
+    if (parsed.length === 0) {
+      setImportMessage('No valid timeline rows found to import.')
+      return
+    }
+    onImportEntries(parsed)
+    setImportMessage(`Imported ${parsed.length} day rows.`)
   }
 
   return (
@@ -143,6 +189,28 @@ function ExportPanel({ entries }) {
         <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 text-[11px] font-mono leading-relaxed text-gray-700 shadow-inner dark:border-white/10 dark:bg-black/30 dark:text-gray-300">
           {timelineText}
         </pre>
+      </div>
+
+      <div className="space-y-2 rounded-2xl border border-gray-200/60 bg-gray-50/50 p-4 dark:border-white/10 dark:bg-black/30">
+        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+          Import timeline
+        </h3>
+        <textarea
+          value={importText}
+          onChange={(event) => setImportText(event.target.value)}
+          placeholder="Paste exported timeline text here..."
+          className="min-h-24 w-full rounded-xl border border-gray-200 bg-white p-3 text-xs text-gray-800 shadow-sm outline-none focus:ring-2 focus:ring-teal-500 dark:border-white/10 dark:bg-black/20 dark:text-gray-100"
+        />
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onImport}
+            className="rounded-xl bg-teal-600 px-4 py-2 text-xs font-black uppercase tracking-wide text-white shadow-md"
+          >
+            Import + Merge
+          </button>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400">{importMessage}</span>
+        </div>
       </div>
     </section>
   )

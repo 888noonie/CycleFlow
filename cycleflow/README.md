@@ -32,5 +32,6 @@ If the repository root is imported, set:
 - 28-day cycle overlay chart
 - Cycle Lens mode
 - Export/share panel
+- Import + merge panel for timeline migration
 - AI handoff panel
 - PWA install support

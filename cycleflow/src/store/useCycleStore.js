@@ -21,6 +21,17 @@ function primaryEmojiFromSymptoms(symptoms) {
   return symptoms[0]
 }
 
+function splitEmojiSequence(value) {
+  if (!value) {
+    return []
+  }
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+    return [...segmenter.segment(value)].map((part) => part.segment).filter(Boolean)
+  }
+  return Array.from(value)
+}
+
 function todayKey() {
   return new Date().toISOString().slice(0, 10)
 }
@@ -123,6 +134,38 @@ const useCycleStore = create(
         get().setActiveDate(today)
         get().saveDraftEntry()
       },
+
+      importEntries: (incomingEntries) =>
+        set((state) => {
+          const byDate = new Map(state.entries.map((entry) => [entry.date, entry]))
+
+          for (const incoming of incomingEntries) {
+            if (!incoming?.date) {
+              continue
+            }
+            const existing = byDate.get(incoming.date)
+            const merged = {
+              ...(existing ?? defaultDraft(incoming.date)),
+              ...incoming,
+              date: incoming.date,
+              id: incoming.id ?? existing?.id ?? incoming.date,
+              symptoms: splitEmojiSequence(
+                Array.isArray(incoming.symptoms)
+                  ? incoming.symptoms.join('')
+                  : Array.isArray(existing?.symptoms)
+                    ? existing.symptoms.join('')
+                    : incoming.emoji ?? existing?.emoji ?? ''
+              ),
+            }
+            merged.emoji = primaryEmojiFromSymptoms(merged.symptoms)
+            merged.updatedAt = new Date().toISOString()
+            byDate.set(incoming.date, merged)
+          }
+
+          return {
+            entries: [...byDate.values()].sort((a, b) => b.date.localeCompare(a.date)),
+          }
+        }),
 
       getEntryByDate: (date) => get().entries.find((entry) => entry.date === date),
     }),

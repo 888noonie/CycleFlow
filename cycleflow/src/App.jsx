@@ -29,6 +29,7 @@ function App() {
   const setCycleStartDate = useCycleStore((state) => state.setCycleStartDate)
   const activeDate = useCycleStore((state) => state.activeDate)
   const setActiveDate = useCycleStore((state) => state.setActiveDate)
+  const importEntries = useCycleStore((state) => state.importEntries)
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_STORAGE_KEY) || 'system')
   const [resolvedTheme, setResolvedTheme] = useState(
     document.documentElement.classList.contains('dark') ? 'dark' : 'light'
@@ -229,7 +230,7 @@ function App() {
         <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
 
         <div className="grid grid-cols-1 gap-4">
-          <ExportPanel entries={entries} />
+          <ExportPanel entries={entries} onImportEntries={importEntries} />
           <AIHookPanel entries={entries} cycleStartDate={cycleStartDate} />
           <PwaReadinessPanel />
         </div>
