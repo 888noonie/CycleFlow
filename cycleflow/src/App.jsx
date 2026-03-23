@@ -91,7 +91,7 @@ function App() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-col gap-4 px-4 py-6 pb-safe pt-safe min-h-screen">
+    <main className="mx-auto flex w-full max-w-[560px] flex-col gap-4 px-2 py-6 pb-safe pt-safe sm:px-3 md:px-4 min-h-screen">
       <header className="mb-2 rounded-2xl glass p-4 shadow-sm transition-all">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
