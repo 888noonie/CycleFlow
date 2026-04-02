@@ -1,27 +1,4 @@
-const EMOJI_OPTIONS = [
-  { emoji: '🧠', label: 'Headache' },
-  { emoji: '🪓', label: 'Migraine' },
-  { emoji: '💦', label: 'Night sweats' },
-  { emoji: '⚡️', label: 'Back pain' },
-  { emoji: '🌫️', label: 'Low mood' },
-  { emoji: '🥺', label: 'Anxiety' },
-  { emoji: '🤬', label: 'Anger' },
-  { emoji: '🫩', label: 'Brain fog' },
-  { emoji: '👽', label: 'Sleep paralysis' },
-  { emoji: '💀', label: 'Sleep++' },
-  { emoji: '🥤', label: 'Thirst' },
-  { emoji: '🍩', label: 'Food++' },
-  { emoji: '🎨', label: 'Crazy dream' },
-  { emoji: '🏆', label: 'Back in the game' },
-  { emoji: '🤹🏼', label: 'Chaotic' },
-  { emoji: '⚰️', label: 'Kill me now' },
-  { emoji: '🪩', label: 'Feeling fab' },
-  { emoji: '🧘🏼‍♀️', label: 'Calm' },
-  { emoji: '🛼', label: 'Energetic' },
-  { emoji: '🫥', label: 'Normal / meh' },
-  { emoji: '⏰', label: 'Late start' },
-  { emoji: '💡', label: 'Extra amfexa' },
-]
+import { SYMPTOM_OPTIONS, getSymptomLabel } from '../data/symptomOptions'
 
 function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
   return (
@@ -44,7 +21,7 @@ function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
                 type="button"
                 onClick={() => onRemove(index)}
                 className="flex items-center gap-1 rounded-full bg-teal-100/80 px-3 py-1.5 text-lg shadow-sm transition-transform active:scale-95 dark:bg-teal-900/50 dark:text-teal-100 border border-teal-200/50 dark:border-teal-700/50"
-                title="Remove this tag"
+                title={`Remove: ${getSymptomLabel(emoji)}`}
               >
                 {emoji}
                 <span className="text-[10px] opacity-60">✕</span>
@@ -52,11 +29,26 @@ function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
             ))
           )}
         </div>
-        <p className="text-xs font-medium text-gray-400 dark:text-gray-500">Timeline view: {selectedEmojis.join('') || '....'}</p>
+        <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
+          Timeline view: {selectedEmojis.join('') || '....'}
+        </p>
+        {selectedEmojis.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Selected symptom labels">
+            {selectedEmojis.map((emoji, index) => (
+              <span
+                key={`tag-${emoji}-${index}`}
+                className="inline-flex items-center gap-1 rounded-lg border border-gray-200/70 bg-white/90 px-2 py-1 text-[10px] font-semibold text-gray-600 shadow-sm dark:border-white/10 dark:bg-gray-800/90 dark:text-gray-300"
+              >
+                <span>{emoji}</span>
+                <span>{getSymptomLabel(emoji)}</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-3">
-        {EMOJI_OPTIONS.map((option) => (
+        {SYMPTOM_OPTIONS.map((option) => (
           <button
             key={option.emoji}
             type="button"
@@ -78,7 +70,7 @@ function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
           <span className="text-xs transition-transform group-open:rotate-180">▼</span>
         </summary>
         <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs font-medium text-gray-600 dark:text-gray-400">
-          {EMOJI_OPTIONS.map((option) => (
+          {SYMPTOM_OPTIONS.map((option) => (
             <li key={`${option.emoji}-legend`} className="flex items-center gap-2">
               <span className="text-sm bg-white dark:bg-gray-800 rounded-md px-1.5 py-0.5 shadow-sm">{option.emoji}</span>
               <span className="truncate">{option.label}</span>

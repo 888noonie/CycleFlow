@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { getCycleDay, getSymptomsText, inferCycleStartDate } from '../utils/cycle'
+import { getCycleDay, inferCycleStartDate } from '../utils/cycle'
+import { getSymptomsLabeledText } from '../data/symptomOptions'
 
 const OVULATION_DAY = 14
 
@@ -14,7 +15,7 @@ function buildPoints(entries, cycleStartDate) {
       return {
         ...entry,
         cycleDay: day,
-        symptomsText: getSymptomsText(entry),
+        symptomsLabeled: getSymptomsLabeledText(entry),
       }
     })
     .filter(Boolean)
@@ -126,6 +127,9 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
             const isSelected = selectedId === point.id
             return (
               <g key={point.id} onClick={() => setSelectedId(point.id)} className="cursor-pointer group">
+                <title>
+                  {format(parseISO(point.date), 'dd/MM/yyyy')} · Cycle day {point.cycleDay} · {point.symptomsLabeled}
+                </title>
                 <circle
                   cx={x}
                   cy={y}
@@ -168,7 +172,7 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
             <p className="font-bold text-gray-900 dark:text-gray-100">
               {format(parseISO(selected.date), 'dd/MM/yyyy EEE')} | Cycle day {selected.cycleDay}
             </p>
-            <p className="text-lg tracking-widest">{selected.symptomsText}</p>
+            <p className="text-base font-medium leading-relaxed tracking-wide">{selected.symptomsLabeled}</p>
             {selected.note && <p className="italic text-gray-500 dark:text-gray-400">"{selected.note}"</p>}
           </div>
         ) : (

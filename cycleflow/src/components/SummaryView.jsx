@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { format, subDays } from 'date-fns'
+import { getSymptomsLabeledText } from '../data/symptomOptions'
 
 function SummaryView({ entries, activeDate, onSelectDate }) {
   const [selectedDate, setSelectedDate] = useState(null)
@@ -62,7 +63,11 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
                   : 'ring-1 ring-black/5 hover:scale-105 hover:shadow-sm dark:ring-white/10'
               } ${hasEntry ? 'text-gray-900' : 'text-gray-500 dark:text-gray-400'}`}
               style={{ backgroundColor: day.entry?.color ?? 'var(--card-bg)' }}
-              title={format(day.date, 'MMM d')}
+              title={
+                day.entry
+                  ? `${format(day.date, 'MMM d')}: ${getSymptomsLabeledText(day.entry)}`
+                  : format(day.date, 'MMM d')
+              }
               aria-label={`Summary day ${format(day.date, 'MMM d')}`}
             >
               {format(day.date, 'd')}
@@ -76,6 +81,9 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
           <div className="space-y-1">
             <p className="font-semibold">{selectedEntry.date}</p>
             <p className="text-lg tracking-widest">{symptomLine(selectedEntry)}</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {getSymptomsLabeledText(selectedEntry)}
+            </p>
             <p className="text-gray-500 dark:text-gray-400">
               {Math.round(selectedEntry.estrogen * 100)}% clarity
               {selectedEntry.note ? ` | "${selectedEntry.note}"` : ''}

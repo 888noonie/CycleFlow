@@ -1,30 +1,6 @@
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
-
-const LEGEND = [
-  { emoji: '🧠', label: 'Headache' },
-  { emoji: '🪓', label: 'Migraine' },
-  { emoji: '💦', label: 'Night sweats' },
-  { emoji: '⚡️', label: 'Back pain' },
-  { emoji: '🌫️', label: 'Low mood' },
-  { emoji: '🥺', label: 'Anxiety' },
-  { emoji: '🤬', label: 'Anger' },
-  { emoji: '🫩', label: 'Brain fog' },
-  { emoji: '👽', label: 'Sleep paralysis' },
-  { emoji: '💀', label: 'Sleep++' },
-  { emoji: '🥤', label: 'Thirst' },
-  { emoji: '🍩', label: 'Food++' },
-  { emoji: '🎨', label: 'Crazy dream' },
-  { emoji: '🏆', label: 'Back in the game' },
-  { emoji: '🤹🏼', label: 'Chaotic' },
-  { emoji: '⚰️', label: 'Kill me now' },
-  { emoji: '🪩', label: 'Feeling fab' },
-  { emoji: '🧘🏼‍♀️', label: 'Calm' },
-  { emoji: '🛼', label: 'Energetic' },
-  { emoji: '🫥', label: 'Normal / meh' },
-  { emoji: '⏰', label: 'Late start' },
-  { emoji: '💡', label: 'Extra amfexa' },
-]
+import { SYMPTOM_OPTIONS as LEGEND } from '../data/symptomOptions'
 
 function exportTimeline({ entries, includeLegend }) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date))

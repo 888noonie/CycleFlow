@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns'
+import { getSymptomsLabeledText } from './data/symptomOptions'
 import EmojiPicker from './components/EmojiPicker'
 import MoodGrid from './components/MoodGrid'
 import EstrogenSlider from './components/EstrogenSlider'
@@ -14,6 +15,7 @@ import PwaReadinessPanel from './components/PwaReadinessPanel'
 import useCycleStore from './store/useCycleStore'
 
 const THEME_STORAGE_KEY = 'cycleflow-theme-preference'
+const WHATS_NEW_STORAGE_KEY = 'cycleflow-whats-new-dismissed-2026-04'
 
 function systemPrefersDark() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -34,12 +36,19 @@ function App() {
   const [resolvedTheme, setResolvedTheme] = useState(
     document.documentElement.classList.contains('dark') ? 'dark' : 'light'
   )
+  const [showWhatsNew, setShowWhatsNew] = useState(
+    () => !localStorage.getItem(WHATS_NEW_STORAGE_KEY)
+  )
 
   const today = useMemo(() => format(new Date(), 'EEE, MMM d'), [])
   const recentEntries = entries.slice(0, 3)
   const entryLine = `${format(new Date(activeDate), 'dd/MM/yyyy EEE')} | ${
     draft.symptoms?.join('') || '....'
   }`
+  const draftLabeledSymptoms = getSymptomsLabeledText({
+    symptoms: draft.symptoms,
+    emoji: draft.emoji,
+  })
 
   useEffect(() => {
     hydrateDraftForToday()
@@ -77,6 +86,9 @@ function App() {
   }, [theme])
 
   const addSymptom = (emoji) => {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      navigator.vibrate(10)
+    }
     const current = Array.isArray(draft.symptoms) ? draft.symptoms : []
     setDraftField('symptoms', [...current, emoji])
     if (!draft.emoji || draft.emoji === '🫥') {
@@ -102,7 +114,9 @@ function App() {
             <div>
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">CycleFlow</p>
             <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Today</h1>
-            <p className="text-sm font-medium text-[var(--text-secondary)]">{today}</p>
+            <p className="text-sm font-medium text-[var(--text-secondary)]">
+              {today} · {entries.length} day{entries.length === 1 ? '' : 's'} saved
+            </p>
             </div>
           </div>
           <div className="flex items-center gap-1 rounded-xl border border-[var(--button-border)] bg-white/60 p-1 text-[11px] dark:border-white/10 dark:bg-black/20 shadow-sm">
@@ -122,6 +136,30 @@ function App() {
             ))}
           </div>
         </div>
+
+        {showWhatsNew && (
+          <div className="mt-3 flex items-start gap-2 rounded-xl border border-teal-200/70 bg-teal-50/90 px-3 py-2.5 text-xs text-teal-950 shadow-sm dark:border-teal-800/50 dark:bg-teal-950/35 dark:text-teal-50">
+            <span className="text-base leading-none" aria-hidden>
+              ✨
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold">What&apos;s new</p>
+              <p className="mt-0.5 font-medium leading-snug opacity-95">
+                Puffy face and blood tracking, readable labels under Timeline view, and richer tooltips on the cycle map.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem(WHATS_NEW_STORAGE_KEY, '1')
+                setShowWhatsNew(false)
+              }}
+              className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-black uppercase tracking-wide text-teal-800 hover:bg-teal-100/90 dark:text-teal-100 dark:hover:bg-white/10"
+            >
+              OK
+            </button>
+          </div>
+        )}
 
         <div className="mt-3 rounded-xl border border-[var(--card-border)] bg-white/70 px-3 py-2 text-xs text-[var(--text-secondary)] shadow-sm dark:bg-black/20">
           Gentle consistency beats intensity. Log a little today, and let patterns tell the story.
@@ -193,6 +231,7 @@ function App() {
             <p className="mt-3 text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
               {entryLine}
             </p>
+            <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">{draftLabeledSymptoms}</p>
             <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
               color {draft.color} | clarity {Math.round(draft.estrogen * 100)}%
               {' | '}fog {Math.round((draft.fog ?? 0) * 100)}%
@@ -207,7 +246,11 @@ function App() {
             ) : (
               <ul className="mt-4 space-y-3">
                 {recentEntries.map((entry) => (
-                  <li key={entry.id} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                  <li
+                    key={entry.id}
+                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300"
+                    title={getSymptomsLabeledText(entry)}
+                  >
                     <span className="w-16 font-black text-gray-400 dark:text-gray-500">{format(new Date(entry.date), 'dd/MM')}</span>
                     <span className="text-xl tracking-widest">{entry.symptoms?.join('') || entry.emoji}</span>
                     <span className="ml-auto font-mono font-bold">{Math.round(entry.estrogen * 100)}%</span>
