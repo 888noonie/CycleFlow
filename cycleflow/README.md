@@ -1,37 +1,29 @@
-# CycleFlow App (Vite + React)
+# CycleFlow **v2.0** (Vite + React PWA)
 
-This folder contains the deployable CycleFlow web app.
+Deployable web app folder. **Production:** `npm run build` → `dist/`.
 
-## Run locally
+## Quick start
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Build
+## Vercel
 
-```bash
-npm run build
-npm run preview
-```
+| Setting | Value |
+|--------|--------|
+| Root Directory | `cycleflow` |
+| Build | `npm run build` |
+| Output | `dist` |
 
-## Deploy on Vercel
+## What’s in v2.0
 
-If the repository root is imported, set:
+- Symptom **emoji + labels** (picker, timeline tags, cycle map, export `labels:` field).
+- **Daily affirmation** line (day-seeded).
+- **Cycle map** connector path after 3+ unique cycle-day points + smooth reveal.
+- **Export / import** merge, **AI handoff**, **PWA** install, **themes**.
 
-- Root Directory: `cycleflow`
-- Build Command: `npm run build`
-- Output Directory: `dist`
+See repository root [**README.md**](../README.md) for full keywords, SEO topics, license (**MIT**), and **N∞N** branding.
 
-## Core features
-
-- Daily symptom stack logging via emojis
-- Brain fog and clarity sliders
-- 30-day summary
-- 28-day cycle overlay chart
-- Cycle Lens mode
-- Export/share panel
-- Import + merge panel for timeline migration
-- AI handoff panel
-- PWA install support
+**Not a medical device** — for self-tracking only.

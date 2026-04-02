@@ -16,7 +16,7 @@ import PwaReadinessPanel from './components/PwaReadinessPanel'
 import useCycleStore from './store/useCycleStore'
 
 const THEME_STORAGE_KEY = 'cycleflow-theme-preference'
-const WHATS_NEW_STORAGE_KEY = 'cycleflow-whats-new-dismissed-2026-04'
+const WHATS_NEW_STORAGE_KEY = 'cycleflow-whats-new-dismissed-v2-0'
 
 function systemPrefersDark() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -107,7 +107,17 @@ function App() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[560px] flex-col gap-4 px-2 py-6 pb-safe pt-safe sm:px-3 md:px-4 min-h-screen">
+    <>
+      <a
+        href="#cycleflow-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-xl focus:bg-teal-600 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+      <main
+        id="cycleflow-main"
+        className="relative mx-auto flex w-full max-w-[560px] flex-col gap-4 px-2 py-6 pb-safe pt-safe sm:px-3 md:px-4 min-h-screen"
+      >
       <header className="mb-2 rounded-2xl glass p-4 shadow-sm transition-all">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -146,10 +156,28 @@ function App() {
               ✨
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-bold">What&apos;s new</p>
-              <p className="mt-0.5 font-medium leading-snug opacity-95">
-                Puffy face and blood tracking, readable labels under Timeline view, and richer tooltips on the cycle map.
-              </p>
+              <p className="font-bold">What&apos;s new in v2.0</p>
+              <ul className="mt-1.5 list-disc space-y-1 pl-4 font-medium leading-snug opacity-95">
+                <li>
+                  <strong>Labels end-to-end</strong> — timeline tags, map tooltips, preview, and{' '}
+                  <span className="whitespace-nowrap rounded bg-black/5 px-1 py-0.5 font-mono text-[10px] dark:bg-white/10">
+                    labels:
+                  </span>{' '}
+                  on export lines.
+                </li>
+                <li>
+                  <strong>New symptoms</strong> (e.g. puffy face, blood present) in picker + legend.
+                </li>
+                <li>
+                  <strong>Daily affirmations</strong> — a fresh supportive line each calendar day.
+                </li>
+                <li>
+                  <strong>Cycle map path</strong> — teal connector after 3+ cycle-day logs + gentle reveal.
+                </li>
+                <li>
+                  <strong>SEO + PWA polish</strong> — meta tags, README keywords, MIT license, <code className="rounded bg-black/5 px-1 text-[10px] dark:bg-white/10">robots.txt</code>, skip link.
+                </li>
+              </ul>
             </div>
             <button
               type="button"
@@ -281,7 +309,36 @@ function App() {
           <PwaReadinessPanel />
         </div>
       </div>
+
+      <footer className="mt-4 border-t border-gray-200/70 pt-8 pb-6 text-center dark:border-white/10">
+        <p className="text-xs font-semibold tracking-wide text-[var(--text-secondary)]">
+          <span className="text-[var(--text-primary)]">CycleFlow</span>{' '}
+          <span className="text-teal-600 dark:text-teal-400">v2.0</span>
+        </p>
+        <p className="mt-2 max-w-sm mx-auto text-[11px] leading-relaxed text-[var(--text-secondary)]">
+          Free & open source — share with anyone who needs gentle cycle & symptom tracking. Not medical advice.
+        </p>
+        <p className="mt-2 text-[11px] text-[var(--text-secondary)]">
+          <a
+            href="https://github.com/888noonie/CycleFlow"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-teal-700 underline decoration-teal-600/30 underline-offset-2 hover:decoration-teal-600 dark:text-teal-400"
+          >
+            Star on GitHub
+          </a>
+          {' · '}
+          MIT license
+        </p>
+        <p
+          className="mt-5 font-black text-xl tracking-[0.4em] text-gray-500 dark:text-gray-400 select-none"
+          aria-label="N infinity N"
+        >
+          N∞N
+        </p>
+      </footer>
     </main>
+    </>
   )
 }
 

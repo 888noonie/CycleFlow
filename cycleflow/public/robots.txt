@@ -1,0 +1,3 @@
+# CycleFlow — allow indexing of the public PWA (adjust if you add a private staging URL)
+User-agent: *
+Allow: /
