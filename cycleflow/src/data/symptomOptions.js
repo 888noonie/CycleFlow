@@ -44,3 +44,16 @@ export function getSymptomsLabeledText(entry) {
   }
   return list.map((e) => `${e} ${getSymptomLabel(e)}`).join(' · ')
 }
+
+/** Labels only, for compact export lines: "Headache · Blood Present" */
+export function getSymptomLabelsOnly(entry) {
+  const list = Array.isArray(entry?.symptoms) && entry.symptoms.length > 0
+    ? entry.symptoms
+    : entry?.emoji
+      ? [entry.emoji]
+      : []
+  if (list.length === 0) {
+    return ''
+  }
+  return list.map((e) => getSymptomLabel(e)).join(' · ')
+}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
-import { SYMPTOM_OPTIONS as LEGEND } from '../data/symptomOptions'
+import { SYMPTOM_OPTIONS as LEGEND, getSymptomLabelsOnly } from '../data/symptomOptions'
 
 function exportTimeline({ entries, includeLegend }) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date))
@@ -25,9 +25,12 @@ function exportTimeline({ entries, includeLegend }) {
     const symptomFallback = entry.emoji ?? '....'
     const symptomText = symptoms && symptoms.length > 0 ? symptoms : symptomFallback
 
+    const labelPart = getSymptomLabelsOnly(entry)
+    const labelSeg = labelPart ? ` | labels: ${labelPart}` : ''
+
     const noteSuffix = entry.note ? ` | "${entry.note}"` : ''
     const fogSuffix = entry.fog === undefined ? '' : ` | fog ${Math.round(entry.fog * 100)}%`
-    return `${format(dateObj, 'dd/MM/yyyy')} ${day}  | ${symptomText}${fogSuffix}${noteSuffix}`
+    return `${format(dateObj, 'dd/MM/yyyy')} ${day}  | ${symptomText}${labelSeg}${fogSuffix}${noteSuffix}`
   })
 
   return [startLine, '', legendBlock, legendBlock ? '' : '', ...lines].filter(Boolean).join('\n')
@@ -125,7 +128,7 @@ function ExportPanel({ entries, onImportEntries }) {
         <div className="space-y-1">
           <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Export / Share</h2>
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-snug">
-            Generates a plain-text timeline like the Bearable-style logs.
+            Plain-text timeline with emoji stack plus a spelled-out labels field for each day.
           </p>
         </div>
         <label className="flex items-center gap-2 cursor-pointer select-none">

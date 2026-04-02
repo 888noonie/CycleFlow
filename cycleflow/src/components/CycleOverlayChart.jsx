@@ -1,9 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { getCycleDay, inferCycleStartDate } from '../utils/cycle'
 import { getSymptomsLabeledText } from '../data/symptomOptions'
 
-const OVULATION_DAY = 14
+function uniqueCyclePointsForConnector(points) {
+  const byDay = new Map()
+  for (const p of points) {
+    const prev = byDay.get(p.cycleDay)
+    if (!prev || String(p.date).localeCompare(String(prev.date)) > 0) {
+      byDay.set(p.cycleDay, p)
+    }
+  }
+  return [...byDay.values()].sort((a, b) => a.cycleDay - b.cycleDay)
+}
 
 function buildPoints(entries, cycleStartDate) {
   return entries
@@ -29,10 +38,36 @@ function markerYFromClarity(estrogen) {
 
 function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart }) {
   const [selectedId, setSelectedId] = useState(null)
+  const sectionRef = useRef(null)
+  const prevConnectorLen = useRef(0)
   const points = useMemo(
     () => buildPoints(entries, cycleStartDate),
     [entries, cycleStartDate]
   )
+  const connectorPath = useMemo(() => uniqueCyclePointsForConnector(points), [points])
+  const showConnector = connectorPath.length >= 3
+  const connectorPointsAttr = useMemo(
+    () =>
+      connectorPath
+        .map((p) => {
+          const x = 25 + ((p.cycleDay - 1) / 27) * 790
+          const y = markerYFromClarity(p.estrogen)
+          return `${x},${y}`
+        })
+        .join(' '),
+    [connectorPath]
+  )
+
+  useEffect(() => {
+    const n = connectorPath.length
+    if (n >= 3 && prevConnectorLen.current < 3) {
+      requestAnimationFrame(() => {
+        sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      })
+    }
+    prevConnectorLen.current = n
+  }, [connectorPath.length])
+
   const selected = points.find((point) => point.id === selectedId) ?? null
   const inferred = useMemo(
     () => inferCycleStartDate(entries, cycleStartDate),
@@ -45,11 +80,16 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
   const activeX = activeCycleDay ? 25 + ((activeCycleDay - 1) / 27) * 790 : null
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-5">
+    <section ref={sectionRef} className="smooth-card space-y-4 rounded-[2rem] p-5 scroll-mt-4">
       <div>
         <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Cycle map with emoji overlays</h2>
         <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
           Fixed 28-day view. Tap markers to inspect notes and symptom stacks.
+          {showConnector && (
+            <span className="mt-1 block text-teal-700 dark:text-teal-300">
+              Path overlay: your days connect in cycle order after three unique cycle-day logs.
+            </span>
+          )}
         </p>
       </div>
 
@@ -119,6 +159,19 @@ function CycleOverlayChart({ entries, cycleStartDate, onApplySuggestedCycleStart
                 YOU
               </text>
             </g>
+          )}
+
+          {showConnector && (
+            <polyline
+              fill="none"
+              stroke="#0d9488"
+              strokeWidth="2.5"
+              strokeDasharray="7 6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.55"
+              points={connectorPointsAttr}
+            />
           )}
 
           {points.map((point) => {

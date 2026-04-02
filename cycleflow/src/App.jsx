@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { getSymptomsLabeledText } from './data/symptomOptions'
+import { getDailyAffirmation } from './data/dailyAffirmations'
 import EmojiPicker from './components/EmojiPicker'
 import MoodGrid from './components/MoodGrid'
 import EstrogenSlider from './components/EstrogenSlider'
@@ -41,6 +42,8 @@ function App() {
   )
 
   const today = useMemo(() => format(new Date(), 'EEE, MMM d'), [])
+  const calendarDay = format(new Date(), 'yyyy-MM-dd')
+  const dailyAffirmation = useMemo(() => getDailyAffirmation(new Date()), [calendarDay])
   const recentEntries = entries.slice(0, 3)
   const entryLine = `${format(new Date(activeDate), 'dd/MM/yyyy EEE')} | ${
     draft.symptoms?.join('') || '....'
@@ -161,8 +164,8 @@ function App() {
           </div>
         )}
 
-        <div className="mt-3 rounded-xl border border-[var(--card-border)] bg-white/70 px-3 py-2 text-xs text-[var(--text-secondary)] shadow-sm dark:bg-black/20">
-          Gentle consistency beats intensity. Log a little today, and let patterns tell the story.
+        <div className="mt-3 rounded-xl border border-[var(--card-border)] bg-white/70 px-3 py-2 text-xs text-[var(--text-secondary)] shadow-sm dark:bg-black/20 leading-relaxed">
+          {dailyAffirmation}
         </div>
 
         <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-[var(--text-secondary)]">
