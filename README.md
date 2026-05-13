@@ -13,8 +13,8 @@ Built for **symptom tracking**, **mood & energy**, **brain fog / clarity**, **PM
 | Need | How CycleFlow helps |
 |------|---------------------|
 | **Menstrual cycle / period tracking** | Cycle start date, 28-day map, cycle-day lens |
-| **PMDD & luteal symptoms** | Emoji stacks, fog + clarity sliders, export timeline |
-| **Perimenopause / hormonal shifts** | Multi-symptom logs + overlays across phases |
+| **PMDD & luteal symptoms** | Emoji stacks, fog + clarity sliders, continuous Pattern Stream |
+| **Perimenopause / hormonal shifts** | Multi-symptom logs, cycle-day lens, and optional correlation windows |
 | **ADHD & cognitive load** | One-tap emoji, sliders, “today” focus, minimal setup |
 | **Privacy-first** | Data stays in **localStorage** on your device (export/import when you choose) |
 | **Install like an app** | **PWA**: Add to Home Screen on **iPhone** & **Android**—no App Store required |
@@ -26,11 +26,14 @@ Built for **symptom tracking**, **mood & energy**, **brain fog / clarity**, **PM
 - **Rich symptom legend** — emoji ↔ labels everywhere (picker, timeline tags, map tooltips, export).
 - **New symptoms** — e.g. **Puffy Face**, **Blood Present**, plus full **ledger** in export.
 - **Export lines with `labels:`** — human-readable names beside emoji stacks for doctors & backups.
+- **Pattern Stream** — an endless, scrollable function graph where good days sit high and heavier symptom-load days sit low, with emoji markers plotted directly on the line.
+- **Simple by default, powerful on tap** — advanced signal rows and cycle hotspots live behind a compact **Pattern details** drawer.
+- **Correlation Lab** — optional before/after windows for a selected symptom, so users can test cascades such as dreams → sweats → pain → fog without cluttering the main view.
+- **Demo data** — load a representative sample dataset when the app is empty, useful for trying the analysis views before adding personal data.
 - **Daily affirmations** — thousands of combinations, **one fresh line per calendar day**.
-- **Cycle map path overlay** — after **3+** unique cycle-day logs, a teal path connects your markers; gentle scroll-into-view on first unlock.
 - **Themes** — Light / Dark / System, persisted.
 - **AI handoff** — copy a structured prompt for ChatGPT-style tools (optional).
-- **Import + merge** — move data between **Safari** and **Home Screen** contexts on iOS.
+- **Import + merge** — move data between **Safari** and **Home Screen** contexts on iOS, or paste a plain-text exported timeline to rebuild the local graph.
 
 ---
 
@@ -105,6 +108,7 @@ Storage can differ between Safari and the installed PWA. Use **Export** → copy
 - Optional **cloud sync** (opt-in) if an official app store build happens.  
 - **Notifications** / reminders (native or web push).  
 - **PDF** or **CSV** export.  
+- Optional **doctor/clinician report** view generated from the Pattern Stream and correlation windows.
 - **Accessibility** audit pass & WCAG tweaks.  
 - **Localization** (i18n).  
 - **Wearables** or Apple Health (only with explicit consent).

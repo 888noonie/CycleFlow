@@ -158,6 +158,11 @@ const useCycleStore = create(
               ),
             }
             merged.emoji = primaryEmojiFromSymptoms(merged.symptoms)
+            merged.estrogen = Number.isFinite(Number(merged.estrogen))
+              ? Number(merged.estrogen)
+              : 0.7
+            merged.fog = Number.isFinite(Number(merged.fog)) ? Number(merged.fog) : 0.4
+            merged.color = merged.color || defaultDraft(incoming.date).color
             merged.updatedAt = new Date().toISOString()
             byDate.set(incoming.date, merged)
           }

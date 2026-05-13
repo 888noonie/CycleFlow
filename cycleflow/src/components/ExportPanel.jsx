@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { SYMPTOM_OPTIONS as LEGEND, getSymptomLabelsOnly } from '../data/symptomOptions'
+import { DEMO_CYCLE_START_DATE, DEMO_ENTRIES } from '../data/demoEntries'
 
 function exportTimeline({ entries, includeLegend }) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date))
@@ -30,7 +31,9 @@ function exportTimeline({ entries, includeLegend }) {
 
     const noteSuffix = entry.note ? ` | "${entry.note}"` : ''
     const fogSuffix = entry.fog === undefined ? '' : ` | fog ${Math.round(entry.fog * 100)}%`
-    return `${format(dateObj, 'dd/MM/yyyy')} ${day}  | ${symptomText}${labelSeg}${fogSuffix}${noteSuffix}`
+    const claritySuffix =
+      entry.estrogen === undefined ? '' : ` | clarity ${Math.round(entry.estrogen * 100)}%`
+    return `${format(dateObj, 'dd/MM/yyyy')} ${day}  | ${symptomText}${labelSeg}${fogSuffix}${claritySuffix}${noteSuffix}`
   })
 
   return [startLine, '', legendBlock, legendBlock ? '' : '', ...lines].filter(Boolean).join('\n')
@@ -40,8 +43,17 @@ function parseImportedTimeline(text) {
   const lines = text.split(/\r?\n/)
   const results = []
   const lineRegex = /^(\d{2})\/(\d{2})\/(\d{4})\s+\w{3}\s+\|\s*(.+)$/
+  const startRegex = /^Start:\s*(\d{2})\/(\d{2})\/(\d{4})/i
+  let startDate = ''
 
   for (const line of lines) {
+    const startMatch = line.trim().match(startRegex)
+    if (startMatch) {
+      const [, dd, mm, yyyy] = startMatch
+      startDate = `${yyyy}-${mm}-${dd}`
+      continue
+    }
+
     const match = line.trim().match(lineRegex)
     if (!match) {
       continue
@@ -53,9 +65,11 @@ function parseImportedTimeline(text) {
     const parts = payload.split('|').map((part) => part.trim()).filter(Boolean)
     const first = parts[0] ?? ''
     const fogPart = parts.find((part) => /^fog\s+\d+%$/i.test(part))
+    const clarityPart = parts.find((part) => /^clarity\s+\d+%$/i.test(part))
     const notePart = parts.find((part) => part.startsWith('"') && part.endsWith('"'))
 
     const fog = fogPart ? Number(fogPart.replace(/[^\d]/g, '')) / 100 : undefined
+    const estrogen = clarityPart ? Number(clarityPart.replace(/[^\d]/g, '')) / 100 : undefined
     const note = notePart ? notePart.slice(1, -1) : ''
 
     results.push({
@@ -63,14 +77,15 @@ function parseImportedTimeline(text) {
       date,
       symptoms: first,
       fog,
+      estrogen,
       note,
     })
   }
 
-  return results
+  return { entries: results, startDate }
 }
 
-function ExportPanel({ entries, onImportEntries }) {
+function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
   const [includeLegend, setIncludeLegend] = useState(true)
   const [copied, setCopied] = useState(false)
   const [importText, setImportText] = useState('')
@@ -114,12 +129,29 @@ function ExportPanel({ entries, onImportEntries }) {
 
   const onImport = () => {
     const parsed = parseImportedTimeline(importText)
-    if (parsed.length === 0) {
+    if (parsed.entries.length === 0) {
       setImportMessage('No valid timeline rows found to import.')
       return
     }
-    onImportEntries(parsed)
-    setImportMessage(`Imported ${parsed.length} day rows.`)
+    onImportEntries(parsed.entries)
+    if (parsed.startDate && onApplyCycleStart) {
+      onApplyCycleStart(parsed.startDate)
+    }
+    setImportMessage(
+      `Imported ${parsed.entries.length} day rows${
+        parsed.startDate ? ` and set start ${parsed.startDate}.` : '.'
+      }`
+    )
+  }
+
+  const onLoadDemo = () => {
+    if (entries.length > 0) {
+      setImportMessage('Demo data is only available before real entries are saved.')
+      return
+    }
+    onImportEntries(DEMO_ENTRIES)
+    onApplyCycleStart?.(DEMO_CYCLE_START_DATE)
+    setImportMessage(`Loaded ${DEMO_ENTRIES.length} demo rows.`)
   }
 
   return (
@@ -190,6 +222,15 @@ function ExportPanel({ entries, onImportEntries }) {
           </button>
           <span className="text-[11px] text-gray-500 dark:text-gray-400">{importMessage}</span>
         </div>
+        {entries.length === 0 && (
+          <button
+            type="button"
+            onClick={onLoadDemo}
+            className="w-full rounded-xl border border-dashed border-teal-300 bg-teal-50 px-4 py-2.5 text-xs font-black uppercase tracking-wide text-teal-800 transition active:scale-[0.98] dark:border-teal-800/60 dark:bg-teal-950/25 dark:text-teal-100"
+          >
+            Load demo data
+          </button>
+        )}
       </div>
     </section>
   )

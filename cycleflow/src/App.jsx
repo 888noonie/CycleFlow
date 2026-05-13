@@ -9,7 +9,8 @@ import FogSlider from './components/FogSlider'
 import QuickNote from './components/QuickNote'
 import SummaryView from './components/SummaryView'
 import ExportPanel from './components/ExportPanel'
-import CycleOverlayChart from './components/CycleOverlayChart'
+import PatternStream from './components/PatternStream'
+import CorrelationLab from './components/CorrelationLab'
 import CycleLensMode from './components/CycleLensMode'
 import AIHookPanel from './components/AIHookPanel'
 import PwaReadinessPanel from './components/PwaReadinessPanel'
@@ -42,8 +43,7 @@ function App() {
   )
 
   const today = useMemo(() => format(new Date(), 'EEE, MMM d'), [])
-  const calendarDay = format(new Date(), 'yyyy-MM-dd')
-  const dailyAffirmation = useMemo(() => getDailyAffirmation(new Date()), [calendarDay])
+  const dailyAffirmation = useMemo(() => getDailyAffirmation(new Date()), [])
   const recentEntries = entries.slice(0, 3)
   const entryLine = `${format(new Date(activeDate), 'dd/MM/yyyy EEE')} | ${
     draft.symptoms?.join('') || '....'
@@ -172,7 +172,7 @@ function App() {
                   <strong>Daily affirmations</strong> — a fresh supportive line each calendar day.
                 </li>
                 <li>
-                  <strong>Cycle map path</strong> — teal connector after 3+ cycle-day logs + gentle reveal.
+                  <strong>Pattern Stream</strong> — continuous history graph and correlation tools.
                 </li>
                 <li>
                   <strong>SEO + PWA polish</strong> — meta tags, README keywords, MIT license, <code className="rounded bg-black/5 px-1 text-[10px] dark:bg-white/10">robots.txt</code>, skip link.
@@ -294,17 +294,26 @@ function App() {
       </section>
 
       <div className="space-y-6 pb-12">
-        <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
-
-        <CycleOverlayChart
+        <PatternStream
           entries={entries}
           cycleStartDate={cycleStartDate}
-          onApplySuggestedCycleStart={setCycleStartDate}
+          onSelectDate={setActiveDate}
         />
+        <CorrelationLab
+          entries={entries}
+          cycleStartDate={cycleStartDate}
+          onSelectDate={setActiveDate}
+        />
+        <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
+
         <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
 
         <div className="grid grid-cols-1 gap-4">
-          <ExportPanel entries={entries} onImportEntries={importEntries} />
+          <ExportPanel
+            entries={entries}
+            onImportEntries={importEntries}
+            onApplyCycleStart={setCycleStartDate}
+          />
           <AIHookPanel entries={entries} cycleStartDate={cycleStartDate} />
           <PwaReadinessPanel />
         </div>
