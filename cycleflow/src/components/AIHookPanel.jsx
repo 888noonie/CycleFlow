@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { format, parseISO } from 'date-fns'
+import { useToast } from '../hooks/useToast'
 import { getCycleDay, getSymptomsText } from '../utils/cycle'
 
 function buildAIPrompt(entries, cycleStartDate) {
@@ -27,6 +28,7 @@ function buildAIPrompt(entries, cycleStartDate) {
 }
 
 function AIHookPanel({ entries, cycleStartDate }) {
+  const { pushToast } = useToast()
   const [copied, setCopied] = useState(false)
   const promptText = useMemo(
     () => buildAIPrompt(entries, cycleStartDate),
@@ -41,6 +43,7 @@ function AIHookPanel({ entries, cycleStartDate }) {
     try {
       await navigator.clipboard.writeText(promptText)
       setCopied(true)
+      pushToast('AI prompt copied')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
@@ -48,14 +51,7 @@ function AIHookPanel({ entries, cycleStartDate }) {
   }
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-6 shadow-xl">
-      <div className="space-y-1">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">AI handoff</h2>
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-snug">
-          One-tap context pack for ChatGPT to discuss patterns and self-improvement ideas.
-        </p>
-      </div>
-
+    <div className="space-y-4">
       <div className="flex gap-3">
         <button
           type="button"
@@ -94,7 +90,7 @@ function AIHookPanel({ entries, cycleStartDate }) {
           into the ChatGPT app if installed.
         </p>
       ) : null}
-    </section>
+    </div>
   )
 }
 

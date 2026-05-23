@@ -2,12 +2,8 @@ function EstrogenSlider({ value, onChange }) {
   const percent = Math.round(value * 100)
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">Estrogen balance</h2>
-          <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">0 = fatigue, 100 = clarity</p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
         <span className="rounded-xl bg-teal-100 px-3 py-1 font-mono text-sm font-bold text-teal-900 dark:bg-teal-900/50 dark:text-teal-200 shadow-sm ring-1 ring-teal-200/50 dark:ring-teal-700/50">
           {percent}% clarity
         </span>
@@ -27,7 +23,7 @@ function EstrogenSlider({ value, onChange }) {
         />
         <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">Clarity</span>
       </div>
-    </section>
+    </div>
   )
 }
 

@@ -2,14 +2,7 @@ import { SYMPTOM_OPTIONS, getSymptomLabel } from '../data/symptomOptions'
 
 function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">Symptoms</h2>
-        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-          Tap to track. Tap active tags to remove.
-        </p>
-      </div>
-
+    <div className="space-y-4">
       <div className="rounded-2xl border border-gray-200/50 bg-gray-50/50 dark:border-white/10 dark:bg-black/20 p-3 shadow-inner">
         <div className="mb-2 flex flex-wrap gap-2">
           {selectedEmojis.length === 0 ? (
@@ -53,7 +46,7 @@ function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
             key={option.emoji}
             type="button"
             onClick={() => onAdd(option.emoji)}
-            className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5 transition-all hover:bg-gray-50 active:scale-95 dark:bg-gray-800 dark:ring-white/10 dark:hover:bg-gray-700"
+            className="focus-ring group flex aspect-square min-h-[48px] flex-col items-center justify-center gap-1 rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5 transition-all hover:bg-gray-50 active:scale-95 dark:bg-gray-800 dark:ring-white/10 dark:hover:bg-gray-700"
             title={option.label}
             aria-label={option.label}
           >
@@ -78,7 +71,7 @@ function EmojiPicker({ selectedEmojis, onAdd, onRemove }) {
           ))}
         </ul>
       </details>
-    </section>
+    </div>
   )
 }
 

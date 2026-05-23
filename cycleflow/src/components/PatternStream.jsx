@@ -101,30 +101,16 @@ function PatternStream({ entries, cycleStartDate, onSelectDate }) {
 
   if (points.length === 0) {
     return (
-      <section className="smooth-card rounded-[2rem] p-5">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Pattern Stream
-        </h2>
-        <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-          No saved entries are available in this browser yet. Paste an exported timeline into
-          Import timeline below, load demo data, or save a day, and the continuous graph will appear here.
-          Good days plot high; heavy symptom-load days plot low.
-        </p>
-      </section>
+      <p className="text-sm font-medium leading-relaxed text-gray-500 dark:text-gray-400">
+        No saved entries yet. Use <strong>Load demo data</strong> above, save a day, or import a
+        timeline in Export — good days plot high; heavier symptom-load days plot low.
+      </p>
     )
   }
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            Pattern Stream
-          </h2>
-          <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-            Continuous history view: high = better function, low = heavier symptom stack.
-          </p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
         <div className="flex items-center gap-2">
           <div className="flex rounded-xl border border-gray-200 bg-white p-1 text-[11px] font-black uppercase tracking-wide dark:border-white/10 dark:bg-black/20">
             {['smooth', 'raw'].map((option) => (
@@ -428,7 +414,7 @@ function PatternStream({ entries, cycleStartDate, onSelectDate }) {
         Score is a visual guide, not a diagnosis: 100 means clearer function; lower scores mean
         higher fog plus heavier weighted symptom stack.
       </p>
-    </section>
+    </div>
   )
 }
 

@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { DEMO_CYCLE_START_DATE, DEMO_ENTRIES } from '../data/demoEntries'
+import { applyDeletion } from '../utils/dataDeletion'
 
 const STORAGE_KEY = 'cycleflow-storage-v1'
 const SCHEMA_VERSION = 1
@@ -173,6 +175,79 @@ const useCycleStore = create(
         }),
 
       getEntryByDate: (date) => get().entries.find((entry) => entry.date === date),
+
+      loadDemoData: () => {
+        if (get().entries.length > 0) {
+          return { ok: false }
+        }
+        set({
+          entries: [...DEMO_ENTRIES].sort((a, b) => b.date.localeCompare(a.date)),
+          cycleStartDate: DEMO_CYCLE_START_DATE,
+        })
+        get().hydrateDraftForToday()
+        return { ok: true }
+      },
+
+      deleteDataInRange: ({ startDate, endDate, scopes }) => {
+        if (!startDate || !endDate || !Array.isArray(scopes) || scopes.length === 0) {
+          return { ok: false, message: 'Choose a range and at least one data type.' }
+        }
+
+        const rangeStart = startDate <= endDate ? startDate : endDate
+        const rangeEnd = startDate <= endDate ? endDate : startDate
+        const state = get()
+        const { entries: nextEntries, removedCount } = applyDeletion(
+          state.entries,
+          rangeStart,
+          rangeEnd,
+          scopes,
+          defaultDraft
+        )
+
+        if (removedCount === 0) {
+          return { ok: false, message: 'Nothing matched your selection.' }
+        }
+
+        const active = state.activeDate || todayKey()
+        const activeInRange = active >= rangeStart && active <= rangeEnd
+        const savedActive = nextEntries.find((entry) => entry.date === active)
+        let draft = state.draft
+
+        if (activeInRange) {
+          if (scopes.includes('entries') || !savedActive) {
+            draft = defaultDraft(active)
+          } else {
+            const symptoms = normalizeSymptoms(savedActive)
+            draft = {
+              ...savedActive,
+              symptoms,
+              emoji: primaryEmojiFromSymptoms(symptoms),
+              fog: savedActive.fog ?? 0.4,
+            }
+          }
+        }
+
+        set({
+          entries: nextEntries.sort((a, b) => b.date.localeCompare(a.date)),
+          draft,
+        })
+
+        return {
+          ok: true,
+          message: `Removed data from ${removedCount} day${removedCount === 1 ? '' : 's'}.`,
+        }
+      },
+
+      resetAllData: () => {
+        const today = todayKey()
+        set({
+          entries: [],
+          cycleStartDate: today,
+          activeDate: today,
+          draft: defaultDraft(today),
+        })
+        return { ok: true }
+      },
     }),
     {
       name: STORAGE_KEY,

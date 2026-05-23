@@ -8,11 +8,7 @@ const MOOD_COLORS = [
 
 function MoodGrid({ selectedColor, onSelect }) {
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">Mood color scale</h2>
-        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">Low to High (pastel, calming gradient).</p>
-      </div>
+    <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 sm:gap-3 rounded-2xl bg-gray-50/50 dark:bg-black/20 p-2 sm:p-3 shadow-inner ring-1 ring-gray-900/5 dark:ring-white/10">
         {MOOD_COLORS.map((mood) => {
           const isSelected = selectedColor === mood.value
@@ -36,7 +32,7 @@ function MoodGrid({ selectedColor, onSelect }) {
           )
         })}
       </div>
-    </section>
+    </div>
   )
 }
 

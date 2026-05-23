@@ -14,16 +14,33 @@ import CorrelationLab from './components/CorrelationLab'
 import CycleLensMode from './components/CycleLensMode'
 import AIHookPanel from './components/AIHookPanel'
 import PwaReadinessPanel from './components/PwaReadinessPanel'
+import CollapsibleSection from './components/CollapsibleSection'
+import DemoDataBanner from './components/DemoDataBanner'
+import AppHeader from './components/AppHeader'
+import FlowDock from './components/FlowDock'
+import FlowBar from './components/FlowBar'
+import FlowBarFab from './components/FlowBarFab'
+import {
+  readFlowBarEnabled,
+  syncFlowBarBodyClass,
+  writeFlowBarEnabled,
+} from './utils/dockPreferences'
+import DataManagementPanel from './components/DataManagementPanel'
+import { APP_VERSION, WHATS_NEW_STORAGE_KEY } from './constants'
+import SectionCollapseProvider from './components/SectionCollapseProvider'
+import ToastProvider from './components/ToastProvider'
+import { useToast } from './hooks/useToast'
 import useCycleStore from './store/useCycleStore'
+import { hasUnsavedDraftChanges } from './utils/draftState'
 
 const THEME_STORAGE_KEY = 'cycleflow-theme-preference'
-const WHATS_NEW_STORAGE_KEY = 'cycleflow-whats-new-dismissed-v2-0'
 
 function systemPrefersDark() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-function App() {
+function AppContent() {
+  const { pushToast } = useToast()
   const draft = useCycleStore((state) => state.draft)
   const entries = useCycleStore((state) => state.entries)
   const setDraftField = useCycleStore((state) => state.setDraftField)
@@ -34,13 +51,21 @@ function App() {
   const activeDate = useCycleStore((state) => state.activeDate)
   const setActiveDate = useCycleStore((state) => state.setActiveDate)
   const importEntries = useCycleStore((state) => state.importEntries)
+  const loadDemoData = useCycleStore((state) => state.loadDemoData)
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_STORAGE_KEY) || 'system')
-  const [resolvedTheme, setResolvedTheme] = useState(
-    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-  )
   const [showWhatsNew, setShowWhatsNew] = useState(
     () => !localStorage.getItem(WHATS_NEW_STORAGE_KEY)
   )
+  const [flowBarEnabled, setFlowBarEnabled] = useState(() => readFlowBarEnabled())
+
+  useEffect(() => {
+    syncFlowBarBodyClass(flowBarEnabled)
+  }, [flowBarEnabled])
+
+  const setFlowBar = (enabled) => {
+    setFlowBarEnabled(enabled)
+    writeFlowBarEnabled(enabled)
+  }
 
   const today = useMemo(() => format(new Date(), 'EEE, MMM d'), [])
   const dailyAffirmation = useMemo(() => getDailyAffirmation(new Date()), [])
@@ -52,6 +77,19 @@ function App() {
     symptoms: draft.symptoms,
     emoji: draft.emoji,
   })
+  const symptomPreview = draft.symptoms?.join('') || draft.emoji || ''
+  const hasUnsavedChanges = useMemo(
+    () => hasUnsavedDraftChanges(draft, entries, activeDate),
+    [draft, entries, activeDate]
+  )
+
+  const handleSave = () => {
+    saveDraftEntry()
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      navigator.vibrate(12)
+    }
+    pushToast(`Saved ${format(new Date(activeDate), 'EEE d MMM')}`)
+  }
 
   useEffect(() => {
     hydrateDraftForToday()
@@ -68,7 +106,6 @@ function App() {
     const applyDark = (enabled) => {
       document.documentElement.classList.toggle('dark', enabled)
       document.documentElement.style.colorScheme = enabled ? 'dark' : 'light'
-      setResolvedTheme(enabled ? 'dark' : 'light')
     }
 
     if (theme === 'dark') {
@@ -116,213 +153,232 @@ function App() {
       </a>
       <main
         id="cycleflow-main"
-        className="relative mx-auto flex w-full max-w-[560px] flex-col gap-4 px-2 py-6 pb-safe pt-safe sm:px-3 md:px-4 min-h-screen"
+        className={`relative mx-auto flex w-full max-w-[560px] flex-col gap-3 px-2 py-5 pt-safe sm:px-3 md:px-4 min-h-screen ${
+          flowBarEnabled ? 'pb-sticky-save' : 'pb-safe'
+        }`}
       >
-      <header className="mb-2 rounded-2xl glass p-4 shadow-sm transition-all">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--card-border)] bg-white/90 text-2xl shadow-sm dark:bg-black/30">
-              🌺
-            </div>
-            <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">CycleFlow</p>
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Today</h1>
-            <p className="text-sm font-medium text-[var(--text-secondary)]">
-              {today} · {entries.length} day{entries.length === 1 ? '' : 's'} saved
-            </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 rounded-xl border border-[var(--button-border)] bg-white/60 p-1 text-[11px] dark:border-white/10 dark:bg-black/20 shadow-sm">
-            {['light', 'dark', 'system'].map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setTheme(option)}
-                className={`rounded-lg px-2 py-1 font-semibold uppercase tracking-wide transition ${
-                  theme === option
-                    ? 'bg-teal-600 text-white dark:bg-teal-500'
-                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10'
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        </div>
+      <AppHeader
+        theme={theme}
+        onThemeChange={setTheme}
+        today={today}
+        entryCount={entries.length}
+        dailyAffirmation={dailyAffirmation}
+        cycleStartDate={cycleStartDate}
+        onCycleStartChange={setCycleStartDate}
+        activeDate={activeDate}
+        onActiveDateChange={setActiveDate}
+        showWhatsNew={showWhatsNew}
+        onDismissWhatsNew={() => setShowWhatsNew(false)}
+      />
 
-        {showWhatsNew && (
-          <div className="mt-3 flex items-start gap-2 rounded-xl border border-teal-200/70 bg-teal-50/90 px-3 py-2.5 text-xs text-teal-950 shadow-sm dark:border-teal-800/50 dark:bg-teal-950/35 dark:text-teal-50">
-            <span className="text-base leading-none" aria-hidden>
-              ✨
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-bold">What&apos;s new in v2.0</p>
-              <ul className="mt-1.5 list-disc space-y-1 pl-4 font-medium leading-snug opacity-95">
-                <li>
-                  <strong>Labels end-to-end</strong> — timeline tags, map tooltips, preview, and{' '}
-                  <span className="whitespace-nowrap rounded bg-black/5 px-1 py-0.5 font-mono text-[10px] dark:bg-white/10">
-                    labels:
-                  </span>{' '}
-                  on export lines.
-                </li>
-                <li>
-                  <strong>New symptoms</strong> (e.g. puffy face, blood present) in picker + legend.
-                </li>
-                <li>
-                  <strong>Daily affirmations</strong> — a fresh supportive line each calendar day.
-                </li>
-                <li>
-                  <strong>Pattern Stream</strong> — continuous history graph and correlation tools.
-                </li>
-                <li>
-                  <strong>SEO + PWA polish</strong> — meta tags, README keywords, MIT license, <code className="rounded bg-black/5 px-1 text-[10px] dark:bg-white/10">robots.txt</code>, skip link.
-                </li>
-              </ul>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                localStorage.setItem(WHATS_NEW_STORAGE_KEY, '1')
-                setShowWhatsNew(false)
-              }}
-              className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-black uppercase tracking-wide text-teal-800 hover:bg-teal-100/90 dark:text-teal-100 dark:hover:bg-white/10"
-            >
-              OK
+      <SectionCollapseProvider>
+        <FlowDock flowBarEnabled={flowBarEnabled} onFlowBarChange={setFlowBar} />
+        <div className="flex flex-col gap-3">
+          <DemoDataBanner />
+
+          <CollapsibleSection
+            sectionId="pattern-stream"
+            title="Pattern Stream"
+            description="Continuous history graph — high = clearer days, low = heavier symptom load."
+          >
+            <PatternStream
+              entries={entries}
+              cycleStartDate={cycleStartDate}
+              onSelectDate={setActiveDate}
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="summary"
+            title="30-day summary"
+            description="Tap a day to jump and see details."
+          >
+            <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="symptoms"
+            title="Symptoms"
+            description="Tap to track. Tap active tags to remove."
+          >
+            <EmojiPicker
+              selectedEmojis={draft.symptoms ?? []}
+              onAdd={addSymptom}
+              onRemove={removeSymptomAt}
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="mood"
+            title="Mood color"
+            description="Low to high — pastel calming gradient."
+          >
+            <MoodGrid
+              selectedColor={draft.color}
+              onSelect={(value) => setDraftField('color', value)}
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="clarity"
+            title="Clarity"
+            description="0 = fatigue, 100 = clarity."
+          >
+            <EstrogenSlider
+              value={draft.estrogen}
+              onChange={(value) => setDraftField('estrogen', value)}
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection sectionId="fog" title="Brain fog" description="0 = clear, 100 = very foggy.">
+            <FogSlider value={draft.fog} onChange={(value) => setDraftField('fog', value)} />
+          </CollapsibleSection>
+
+          <CollapsibleSection sectionId="note" title="One word for today" description="Optional short note.">
+            <QuickNote value={draft.note} onChange={(value) => setDraftField('note', value)} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="save-preview"
+            title="Save Day"
+            description="Save the editing day and review recent logs."
+          >
+            <button type="button" onClick={handleSave} className="btn-primary w-full py-5 text-base">
+              Save selected day
             </button>
-          </div>
-        )}
 
-        <div className="mt-3 rounded-xl border border-[var(--card-border)] bg-white/70 px-3 py-2 text-xs text-[var(--text-secondary)] shadow-sm dark:bg-black/20 leading-relaxed">
-          {dailyAffirmation}
-        </div>
+            <div className="space-y-4 pt-2">
+              <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+                  Preview entry
+                </h3>
+                <p className="mt-3 text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
+                  {entryLine}
+                </p>
+                <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {draftLabeledSymptoms}
+                </p>
+                <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  color {draft.color} | clarity {Math.round(draft.estrogen * 100)}%
+                  {' | '}fog {Math.round((draft.fog ?? 0) * 100)}%
+                  {draft.note ? ` | "${draft.note}"` : ''}
+                </p>
+              </div>
 
-        <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-[var(--text-secondary)]">
-          <span>Theme</span>
-          <span className="rounded-md border border-[var(--card-border)] px-2 py-0.5 uppercase">
-            pref: {theme} | active: {resolvedTheme}
-          </span>
-        </div>
-        
-        <div className="mt-4 flex flex-col gap-2">
-          <div className="flex items-center justify-between rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] p-3 px-4 transition-colors">
-            <label htmlFor="cycle-start" className="text-sm font-bold text-[var(--text-secondary)]">
-              Cycle start
-            </label>
-            <input
-              id="cycle-start"
-              type="date"
-              value={cycleStartDate}
-              onChange={(event) => setCycleStartDate(event.target.value)}
-              className="rounded-lg border-none bg-transparent text-sm font-black text-[var(--text-primary)] focus:ring-0 text-right cursor-pointer"
+              <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+                  Recent entries ({entries.length})
+                </h3>
+                {recentEntries.length === 0 ? (
+                  <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    No saved entries yet.
+                  </p>
+                ) : (
+                  <ul className="mt-4 space-y-3">
+                    {recentEntries.map((entry) => (
+                      <li
+                        key={entry.id}
+                        className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300"
+                        title={getSymptomsLabeledText(entry)}
+                      >
+                        <span className="w-16 font-black text-gray-400 dark:text-gray-500">
+                          {format(new Date(entry.date), 'dd/MM')}
+                        </span>
+                        <span className="text-xl tracking-widest">
+                          {entry.symptoms?.join('') || entry.emoji}
+                        </span>
+                        <span className="ml-auto font-mono font-bold">
+                          {Math.round(entry.estrogen * 100)}%
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="correlation-lab"
+            title="Correlation Lab"
+            description="Before/after windows for a selected symptom."
+            badge="optional"
+          >
+            <CorrelationLab
+              entries={entries}
+              cycleStartDate={cycleStartDate}
+              onSelectDate={setActiveDate}
             />
-          </div>
-          <div className="flex items-center justify-between rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] p-3 px-4 transition-colors">
-            <label htmlFor="entry-date" className="text-sm font-bold text-[var(--text-secondary)]">
-              Editing day
-            </label>
-            <input
-              id="entry-date"
-              type="date"
-              value={activeDate}
-              onChange={(event) => setActiveDate(event.target.value)}
-              className="rounded-lg border-none bg-transparent text-sm font-black text-[var(--text-primary)] focus:ring-0 text-right cursor-pointer"
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="cycle-lens"
+            title="Cycle Lens"
+            description="Patterns by cycle day across months."
+            badge="optional"
+          >
+            <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="export"
+            title="Export / share"
+            description="Plain-text timeline with labels for clinicians or backup."
+          >
+            <ExportPanel
+              entries={entries}
+              onImportEntries={importEntries}
+              onApplyCycleStart={setCycleStartDate}
+              onLoadDemo={loadDemoData}
             />
-          </div>
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="ai-handoff"
+            title="AI handoff"
+            description="Copy a context pack for ChatGPT-style tools."
+          >
+            <AIHookPanel entries={entries} cycleStartDate={cycleStartDate} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="pwa"
+            title="Install & readiness"
+            description="Add to Home Screen — no App Store required."
+          >
+            <PwaReadinessPanel />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            sectionId="data-management"
+            title="Data management"
+            description="Remove logs by date range — hold 3 seconds to confirm."
+            badge="careful"
+          >
+            <DataManagementPanel />
+          </CollapsibleSection>
         </div>
-      </header>
 
-      <section className="flex-1 space-y-8 rounded-[2rem] smooth-card p-6 shadow-xl">
-        <EmojiPicker
-          selectedEmojis={draft.symptoms ?? []}
-          onAdd={addSymptom}
-          onRemove={removeSymptomAt}
-        />
-        <MoodGrid
-          selectedColor={draft.color}
-          onSelect={(value) => setDraftField('color', value)}
-        />
-        <EstrogenSlider
-          value={draft.estrogen}
-          onChange={(value) => setDraftField('estrogen', value)}
-        />
-        <FogSlider value={draft.fog} onChange={(value) => setDraftField('fog', value)} />
-        <QuickNote value={draft.note} onChange={(value) => setDraftField('note', value)} />
-
-        <button
-          type="button"
-          onClick={saveDraftEntry}
-          className="w-full rounded-[1.5rem] bg-[var(--accent-color)] px-6 py-5 text-lg font-black tracking-wide text-white shadow-lg shadow-[var(--accent-color)]/20 border border-[var(--button-border)] transition-all hover:opacity-90 active:scale-[0.97]"
-        >
-          SAVE SELECTED DAY
-        </button>
-
-        <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-white/5">
-          <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">Preview entry</h3>
-            <p className="mt-3 text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
-              {entryLine}
-            </p>
-            <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">{draftLabeledSymptoms}</p>
-            <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-              color {draft.color} | clarity {Math.round(draft.estrogen * 100)}%
-              {' | '}fog {Math.round((draft.fog ?? 0) * 100)}%
-              {draft.note ? ` | "${draft.note}"` : ''}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-gray-200/60 bg-gray-50/50 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">Recent entries ({entries.length})</h3>
-            {recentEntries.length === 0 ? (
-              <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">No saved entries yet.</p>
-            ) : (
-              <ul className="mt-4 space-y-3">
-                {recentEntries.map((entry) => (
-                  <li
-                    key={entry.id}
-                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300"
-                    title={getSymptomsLabeledText(entry)}
-                  >
-                    <span className="w-16 font-black text-gray-400 dark:text-gray-500">{format(new Date(entry.date), 'dd/MM')}</span>
-                    <span className="text-xl tracking-widest">{entry.symptoms?.join('') || entry.emoji}</span>
-                    <span className="ml-auto font-mono font-bold">{Math.round(entry.estrogen * 100)}%</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <div className="space-y-6 pb-12">
-        <PatternStream
-          entries={entries}
-          cycleStartDate={cycleStartDate}
-          onSelectDate={setActiveDate}
-        />
-        <CorrelationLab
-          entries={entries}
-          cycleStartDate={cycleStartDate}
-          onSelectDate={setActiveDate}
-        />
-        <SummaryView entries={entries} activeDate={activeDate} onSelectDate={setActiveDate} />
-
-        <CycleLensMode entries={entries} cycleStartDate={cycleStartDate} />
-
-        <div className="grid grid-cols-1 gap-4">
-          <ExportPanel
-            entries={entries}
-            onImportEntries={importEntries}
-            onApplyCycleStart={setCycleStartDate}
+        {flowBarEnabled ? (
+          <FlowBar
+            activeDate={activeDate}
+            symptomPreview={symptomPreview}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onSave={handleSave}
+            onHide={() => setFlowBar(false)}
           />
-          <AIHookPanel entries={entries} cycleStartDate={cycleStartDate} />
-          <PwaReadinessPanel />
-        </div>
-      </div>
+        ) : (
+          <FlowBarFab
+            hasUnsavedChanges={hasUnsavedChanges}
+            onShow={() => setFlowBar(true)}
+          />
+        )}
+      </SectionCollapseProvider>
 
-      <footer className="mt-4 border-t border-gray-200/70 pt-8 pb-6 text-center dark:border-white/10">
+      <footer className="mt-2 border-t border-gray-200/70 pt-8 pb-6 text-center dark:border-white/10">
         <p className="text-xs font-semibold tracking-wide text-[var(--text-secondary)]">
           <span className="text-[var(--text-primary)]">CycleFlow</span>{' '}
-          <span className="text-teal-600 dark:text-teal-400">v2.0</span>
+          <span className="text-teal-600 dark:text-teal-400">v{APP_VERSION}</span>
         </p>
         <p className="mt-2 max-w-sm mx-auto text-[11px] leading-relaxed text-[var(--text-secondary)]">
           Free & open source — share with anyone who needs gentle cycle & symptom tracking. Not medical advice.
@@ -348,6 +404,14 @@ function App() {
       </footer>
     </main>
     </>
+  )
+}
+
+function App() {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   )
 }
 

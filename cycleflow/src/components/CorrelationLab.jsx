@@ -132,28 +132,15 @@ function CorrelationLab({ entries, cycleStartDate, onSelectDate }) {
 
   if (points.length === 0) {
     return (
-      <section className="smooth-card rounded-[2rem] p-5">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Correlation Lab
-        </h2>
-        <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-          Import a timeline or load demo data first, then choose a symptom to inspect the 3 days
-          before and after it.
-        </p>
-      </section>
+      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Load demo data or save entries, then pick a symptom to inspect the 3 days before and after
+        it.
+      </p>
     )
   }
 
   return (
-    <details className="smooth-card rounded-[2rem] p-5">
-      <summary className="cursor-pointer text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-        Correlation Lab
-        <span className="ml-2 align-middle text-xs font-black uppercase tracking-[0.14em] text-gray-400">
-          optional
-        </span>
-      </summary>
-
-      <div className="mt-4 space-y-4">
+    <div className="space-y-4">
 
       <div className="overflow-x-auto rounded-2xl border border-gray-200/60 bg-gray-50/60 p-2 shadow-inner dark:border-white/10 dark:bg-black/20">
         <div className="flex min-w-max gap-2">
@@ -316,8 +303,7 @@ function CorrelationLab({ entries, cycleStartDate, onSelectDate }) {
         Reads calendar days, not just adjacent rows. Missing days are shown as no log so gaps do
         not masquerade as correlations.
       </p>
-      </div>
-    </details>
+    </div>
   )
 }
 

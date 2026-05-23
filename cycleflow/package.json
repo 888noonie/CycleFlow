@@ -1,8 +1,8 @@
 {
   "name": "cycleflow",
   "private": true,
-  "version": "2.0.0",
-  "description": "CycleFlow v2.0 — free mobile-first PWA for menstrual cycle, PMDD, perimenopause & ADHD-friendly symptom tracking (emoji stacks, export, cycle map).",
+  "version": "2.1.0",
+  "description": "CycleFlow v2.1 — free mobile-first PWA for menstrual cycle, PMDD, perimenopause & ADHD-friendly symptom tracking (emoji stacks, export, cycle map).",
   "keywords": [
     "cycle-tracker",
     "symptom-tracker",
@@ -28,7 +28,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "stop": "bash scripts/stop-dev.sh",
+    "clear-cache": "bash scripts/clear-cache.sh"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

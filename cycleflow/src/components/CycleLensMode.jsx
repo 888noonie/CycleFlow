@@ -47,14 +47,7 @@ function CycleLensMode({ entries, cycleStartDate }) {
   const maxCount = Math.max(...stats.map((item) => item.count), 1)
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-5">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Cycle Lens mode</h2>
-        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-          See repeated patterns by cycle day across multiple months.
-        </p>
-      </div>
-
+    <div className="space-y-4">
       <div className="rounded-2xl border border-amber-200/50 bg-amber-50/50 p-4 shadow-sm dark:border-amber-900/30 dark:bg-amber-900/10">
         <p className="text-sm font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider">Hotspot days</p>
         {hotspots.length === 0 ? (
@@ -131,7 +124,7 @@ function CycleLensMode({ entries, cycleStartDate }) {
           </ul>
         )}
       </div>
-    </section>
+    </div>
   )
 }
 

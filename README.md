@@ -1,4 +1,4 @@
-# CycleFlow · free cycle & symptom tracker (PWA) — **v2.0**
+# CycleFlow · free cycle & symptom tracker (PWA) — **v2.1**
 
 **CycleFlow** is a **free, open-source, mobile-first progressive web app (PWA)** for people who need **fast daily logging** and **gentle pattern visibility** across the menstrual cycle—without another paywalled “wellness” subscription.
 
@@ -18,6 +18,21 @@ Built for **symptom tracking**, **mood & energy**, **brain fog / clarity**, **PM
 | **ADHD & cognitive load** | One-tap emoji, sliders, “today” focus, minimal setup |
 | **Privacy-first** | Data stays in **localStorage** on your device (export/import when you choose) |
 | **Install like an app** | **PWA**: Add to Home Screen on **iPhone** & **Android**—no App Store required |
+
+---
+
+## What’s new in v2.1
+
+Built for **PMDD**, **ADHD**, and days when logging feels impossible — v2.1 adds **calmer layout**, **optional navigation docks**, and **safer data control**.
+
+- **See patterns first** — Pattern Stream and 30-day summary sit above daily logging.
+- **Your layout, remembered** — every section collapses; reopen only what you need.
+- **FlowDock** — bright `›` on the left edge only; tap to open Graph · 30 days · Log · Save Day (🗓️ 📅).
+- **FlowBar** — optional bottom save strip; off by default, show when you want one-thumb save.
+- **Data management** — delete by date range and data type; erase-all requires typing `DELETE` + a 3-second hold.
+- **Gentler UI** — clearer type, focus states, toasts instead of clutter.
+
+Full narrative: [WHATS_NEW_v2.1.md](WHATS_NEW_v2.1.md)
 
 ---
 
@@ -103,7 +118,7 @@ Storage can differ between Safari and the installed PWA. Use **Export** → copy
 
 ---
 
-## Roadmap (post–v2.0 ideas)
+## Roadmap (post–v2.1 ideas)
 
 - Optional **cloud sync** (opt-in) if an official app store build happens.  
 - **Notifications** / reminders (native or web push).  
@@ -115,4 +130,4 @@ Storage can differ between Safari and the installed PWA. Use **Export** → copy
 
 ---
 
-**CycleFlow v2.0** · **N∞N** · MIT · built to stay **free** for anyone who needs it.
+**CycleFlow v2.1** · **N∞N** · MIT · built to stay **free** for anyone who needs it.

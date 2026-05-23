@@ -37,12 +37,7 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
   }
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-5">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">30-day summary</h2>
-        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">Tap a day to see details.</p>
-      </div>
-
+    <div className="space-y-4">
       <div className="grid grid-cols-6 gap-2 sm:gap-3 rounded-2xl bg-gray-50/50 p-3 shadow-inner ring-1 ring-gray-900/5 dark:bg-black/20 dark:ring-white/10">
         {days.map((day) => {
           const isSelected = selectedDate === day.key
@@ -106,7 +101,7 @@ function SummaryView({ entries, activeDate, onSelectDate }) {
           <span className="text-gray-900 dark:text-gray-100">{avgClarity === null ? 'No data yet' : `${avgClarity}%`}</span>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
 

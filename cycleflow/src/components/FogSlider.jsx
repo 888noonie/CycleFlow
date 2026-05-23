@@ -2,14 +2,10 @@ function FogSlider({ value, onChange }) {
   const percent = Math.round((Number(value) || 0) * 100)
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">Brain fog</h2>
-          <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">0 = clear, 100 = very foggy</p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
         <span className="rounded-xl bg-indigo-100 px-3 py-1 font-mono text-sm font-bold text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-200 shadow-sm ring-1 ring-indigo-200/50 dark:ring-indigo-700/50">
-          {percent}%
+          {percent}% fog
         </span>
       </div>
 
@@ -27,7 +23,7 @@ function FogSlider({ value, onChange }) {
         />
         <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">Foggy</span>
       </div>
-    </section>
+    </div>
   )
 }
 

@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { SYMPTOM_OPTIONS as LEGEND, getSymptomLabelsOnly } from '../data/symptomOptions'
-import { DEMO_CYCLE_START_DATE, DEMO_ENTRIES } from '../data/demoEntries'
+import { DEMO_ENTRIES } from '../data/demoEntries'
+import { useToast } from '../hooks/useToast'
 
 function exportTimeline({ entries, includeLegend }) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date))
@@ -85,7 +86,8 @@ function parseImportedTimeline(text) {
   return { entries: results, startDate }
 }
 
-function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
+function ExportPanel({ entries, onImportEntries, onApplyCycleStart, onLoadDemo }) {
+  const { pushToast } = useToast()
   const [includeLegend, setIncludeLegend] = useState(true)
   const [copied, setCopied] = useState(false)
   const [importText, setImportText] = useState('')
@@ -100,6 +102,7 @@ function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
     try {
       await navigator.clipboard.writeText(timelineText)
       setCopied(true)
+      pushToast('Timeline copied')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       const textarea = document.createElement('textarea')
@@ -111,6 +114,7 @@ function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
       document.execCommand('copy')
       document.body.removeChild(textarea)
       setCopied(true)
+      pushToast('Timeline copied')
       setTimeout(() => setCopied(false), 2000)
     }
   }
@@ -125,6 +129,7 @@ function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    pushToast('Download started', { tone: 'info' })
   }
 
   const onImport = () => {
@@ -137,32 +142,25 @@ function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
     if (parsed.startDate && onApplyCycleStart) {
       onApplyCycleStart(parsed.startDate)
     }
-    setImportMessage(
-      `Imported ${parsed.entries.length} day rows${
-        parsed.startDate ? ` and set start ${parsed.startDate}.` : '.'
-      }`
-    )
+    const msg = `Imported ${parsed.entries.length} day rows${
+      parsed.startDate ? ` and set start ${parsed.startDate}.` : '.'
+    }`
+    setImportMessage(msg)
+    pushToast(`Imported ${parsed.entries.length} days`)
   }
 
-  const onLoadDemo = () => {
-    if (entries.length > 0) {
-      setImportMessage('Demo data is only available before real entries are saved.')
+  const onLoadDemoClick = () => {
+    const result = onLoadDemo?.()
+    if (result?.ok) {
+      setImportMessage(`Loaded ${DEMO_ENTRIES.length} demo rows.`)
       return
     }
-    onImportEntries(DEMO_ENTRIES)
-    onApplyCycleStart?.(DEMO_CYCLE_START_DATE)
-    setImportMessage(`Loaded ${DEMO_ENTRIES.length} demo rows.`)
+    setImportMessage('Demo data is only available before real entries are saved.')
   }
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-6 shadow-xl">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Export / Share</h2>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-snug">
-            Plain-text timeline with emoji stack plus a spelled-out labels field for each day.
-          </p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-start justify-end">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -225,14 +223,14 @@ function ExportPanel({ entries, onImportEntries, onApplyCycleStart }) {
         {entries.length === 0 && (
           <button
             type="button"
-            onClick={onLoadDemo}
+            onClick={onLoadDemoClick}
             className="w-full rounded-xl border border-dashed border-teal-300 bg-teal-50 px-4 py-2.5 text-xs font-black uppercase tracking-wide text-teal-800 transition active:scale-[0.98] dark:border-teal-800/60 dark:bg-teal-950/25 dark:text-teal-100"
           >
             Load demo data
           </button>
         )}
       </div>
-    </section>
+    </div>
   )
 }
 

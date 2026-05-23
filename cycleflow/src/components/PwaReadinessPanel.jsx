@@ -24,14 +24,7 @@ function PwaReadinessPanel() {
   }, [])
 
   return (
-    <section className="smooth-card space-y-4 rounded-[2rem] p-6 shadow-xl">
-      <div className="space-y-1">
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Install and readiness</h2>
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-snug">
-          This is a web app install (PWA), no App Store registration required.
-        </p>
-      </div>
-
+    <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div className={`rounded-2xl p-4 flex flex-col items-center justify-center transition-all shadow-inner ring-1 ${
           isOnline 
@@ -73,7 +66,7 @@ function PwaReadinessPanel() {
           ))}
         </ol>
       </div>
-    </section>
+    </div>
   )
 }
 
