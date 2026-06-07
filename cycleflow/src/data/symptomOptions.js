@@ -24,6 +24,7 @@ export const SYMPTOM_OPTIONS = [
   { emoji: '🫥', label: 'Normal / meh' },
   { emoji: '⏰', label: 'Late start' },
   { emoji: '💡', label: 'Extra amfexa' },
+  { emoji: '🦠', label: 'Virus' },
 ]
 
 const labelByEmoji = new Map(SYMPTOM_OPTIONS.map((o) => [o.emoji, o.label]))
