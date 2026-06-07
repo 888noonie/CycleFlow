@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { format } from 'date-fns'
 import { getSymptomsLabeledText } from './data/symptomOptions'
 import { getDailyAffirmation } from './data/dailyAffirmations'
@@ -27,6 +28,7 @@ import {
   writeFlowBarEnabled,
 } from './utils/dockPreferences'
 import DataManagementPanel from './components/DataManagementPanel'
+import PrivacyNotice from './components/PrivacyNotice'
 import { APP_VERSION, WHATS_NEW_STORAGE_KEY } from './constants'
 import SectionCollapseProvider from './components/SectionCollapseProvider'
 import ToastProvider from './components/ToastProvider'
@@ -406,6 +408,7 @@ function AppContent() {
           {' · '}
           MIT license
         </p>
+        <PrivacyNotice />
         <p
           className="mt-5 font-black text-xl tracking-[0.4em] text-gray-500 dark:text-gray-400 select-none"
           aria-label="N infinity N"
@@ -422,6 +425,7 @@ function App() {
   return (
     <ToastProvider>
       <AppContent />
+      <Analytics />
     </ToastProvider>
   )
 }

@@ -1,4 +1,4 @@
-# CycleFlow **v2.1.1** (Vite + React PWA)
+# CycleFlow **v2.1.2** (Vite + React PWA)
 
 **Live:** [cycle-flow-nu.vercel.app](https://cycle-flow-nu.vercel.app)
 
@@ -36,3 +36,9 @@ FlowDock, FlowBar, collapsible sections, data management, install UX, 🦠 Virus
 See root [README.md](../README.md) and [WHATS_NEW_v2.1.md](../WHATS_NEW_v2.1.md).
 
 **Not a medical device** — self-tracking only.
+
+## Privacy & analytics
+
+- **Your cycle logs never leave your device** — symptoms, mood, notes, and exports stay in local storage unless you choose to export them.
+- **Anonymous page views** — we use [Vercel Web Analytics](https://vercel.com/docs/analytics) (no cookies, no health data) to see how many people use the app. The same disclosure appears in the app footer.
+- Enable **Analytics** in the [Vercel project dashboard](https://vercel.com/docs/analytics/quickstart) after deploy if it is not already on.
