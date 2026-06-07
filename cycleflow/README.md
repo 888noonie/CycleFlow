@@ -1,8 +1,8 @@
-# CycleFlow **v2.1** (Vite + React PWA)
+# CycleFlow **v2.1.1** (Vite + React PWA)
 
-Deployable web app folder. **Production:** `npm run build` → `dist/`.
+**Live:** [cycle-flow-nu.vercel.app](https://cycle-flow-nu.vercel.app)
 
-**Live app:** [cycle-flow-nu.vercel.app](https://cycle-flow-nu.vercel.app)
+Deployable app folder — `npm run build` → `dist/`.
 
 ## Quick start
 
@@ -11,11 +11,15 @@ npm install
 npm run dev
 ```
 
-Phone on same Wi‑Fi:
+## Install (for testers)
 
-```bash
-npm run dev -- --host 0.0.0.0 --port 5173
-```
+| Platform | Steps |
+|----------|--------|
+| **iPhone** | Safari → open live URL → Share → Add to Home Screen |
+| **Android** | Chrome → Install now (in app) or ⋮ → Install app |
+| **Desktop** | Chrome/Edge → install icon in address bar |
+
+In-app: **Install CycleFlow** section + dismissible install banner at the top.
 
 ## Vercel
 
@@ -25,20 +29,10 @@ npm run dev -- --host 0.0.0.0 --port 5173
 | Build | `npm run build` |
 | Output | `dist` |
 
-## What’s in v2.1
+## v2.1 highlights
 
-- **Layout for low cognitive load** — Pattern Stream + 30-day summary before daily logging; every section collapses and remembers state.
-- **FlowDock** — bright `›` on the left edge; tap for Graph · 30 days · Log · Save Day.
-- **FlowBar** — optional bottom save strip (off by default).
-- **Data management** — delete by date range and data type; erase-all needs `DELETE` + 3s hold.
-- **Demo data** — sample timeline when storage is empty.
-- **Daily affirmation** — one fresh line per calendar day (~8k combinations).
-- Symptom **emoji + labels**, **Correlation Lab**, **Cycle Lens**, export/import, AI handoff, PWA install, themes.
+FlowDock, FlowBar, collapsible sections, data management, install UX, 🦠 Virus symptom.
 
-See repository root [**README.md**](../README.md) and [**WHATS_NEW_v2.1.md**](../WHATS_NEW_v2.1.md).
+See root [README.md](../README.md) and [WHATS_NEW_v2.1.md](../WHATS_NEW_v2.1.md).
 
-**Not a medical device** — for self-tracking only.
-
-## After deploying an update
-
-Existing **Add to Home Screen** installs may need one refresh (or close and reopen) so the service worker picks up v2.1.
+**Not a medical device** — self-tracking only.

@@ -172,6 +172,11 @@ input[type="range"]:active::-webkit-slider-thumb {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Install tip banner */
+.install-banner {
+  animation: section-reveal 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* Daily affirmation — centred inspirational line */
 .affirmation-quote {
   font-style: normal;

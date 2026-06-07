@@ -18,6 +18,7 @@ import CollapsibleSection from './components/CollapsibleSection'
 import DemoDataBanner from './components/DemoDataBanner'
 import AppHeader from './components/AppHeader'
 import FlowDock from './components/FlowDock'
+import InstallBanner from './components/InstallBanner'
 import FlowBar from './components/FlowBar'
 import FlowBarFab from './components/FlowBarFab'
 import {
@@ -32,11 +33,20 @@ import ToastProvider from './components/ToastProvider'
 import { useToast } from './hooks/useToast'
 import useCycleStore from './store/useCycleStore'
 import { hasUnsavedDraftChanges } from './utils/draftState'
+import { useSectionCollapse } from './hooks/useSectionCollapse'
+import { jumpToSection } from './utils/navigation'
 
 const THEME_STORAGE_KEY = 'cycleflow-theme-preference'
 
 function systemPrefersDark() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
+}
+
+function InstallBannerGate() {
+  const { setSectionOpen } = useSectionCollapse()
+  return (
+    <InstallBanner onOpenInstallSection={() => jumpToSection('pwa', setSectionOpen)} />
+  )
 }
 
 function AppContent() {
@@ -174,6 +184,7 @@ function AppContent() {
       <SectionCollapseProvider>
         <FlowDock flowBarEnabled={flowBarEnabled} onFlowBarChange={setFlowBar} />
         <div className="flex flex-col gap-3">
+          <InstallBannerGate />
           <DemoDataBanner />
 
           <CollapsibleSection
@@ -343,8 +354,8 @@ function AppContent() {
 
           <CollapsibleSection
             sectionId="pwa"
-            title="Install & readiness"
-            description="Add to Home Screen — no App Store required."
+            title="Install CycleFlow"
+            description="Add to Home Screen — one-tap install on Android; guided steps for iPhone."
           >
             <PwaReadinessPanel />
           </CollapsibleSection>

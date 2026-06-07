@@ -1,7 +1,7 @@
 {
   "name": "cycleflow",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "CycleFlow v2.1 — free mobile-first PWA for menstrual cycle, PMDD, perimenopause & ADHD-friendly symptom tracking (emoji stacks, export, cycle map).",
   "keywords": [
     "cycle-tracker",

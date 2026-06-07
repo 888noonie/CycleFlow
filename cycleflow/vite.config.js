@@ -18,7 +18,7 @@ export default defineConfig({
         skipWaiting: true,
       },
       manifest: {
-        name: 'CycleFlow v2.1',
+        name: 'CycleFlow v2.1.1',
         short_name: 'CycleFlow',
         description:
           'Free cycle & symptom tracker PWA — PMDD, perimenopause, ADHD-friendly logging, emoji stacks, clarity/fog sliders, export & cycle map.',

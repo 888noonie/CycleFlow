@@ -1,10 +1,41 @@
-# CycleFlow · free cycle & symptom tracker (PWA) — **v2.1**
+# CycleFlow · free cycle & symptom tracker (PWA) — **v2.1.1**
+
+**Live app:** [cycle-flow-nu.vercel.app](https://cycle-flow-nu.vercel.app)
 
 **CycleFlow** is a **free, open-source, mobile-first progressive web app (PWA)** for people who need **fast daily logging** and **gentle pattern visibility** across the menstrual cycle—without another paywalled “wellness” subscription.
 
 Built for **symptom tracking**, **mood & energy**, **brain fog / clarity**, **PMDD-aware** patterns, **perimenopause** swings, **ADHD-friendly** frictionless entry, and **Bearable-style** plain-text exports you can share with a clinician or keep private on-device.
 
 > **Not medical advice.** CycleFlow is for self-tracking and reflection, not diagnosis or treatment.
+
+---
+
+## Install CycleFlow (~30 seconds)
+
+No App Store account required. Your data stays on the device.
+
+### iPhone or iPad (recommended: Safari)
+
+1. Open **[cycle-flow-nu.vercel.app](https://cycle-flow-nu.vercel.app)** in **Safari** (not Chrome or an in-app browser).
+2. Tap **Share** (↑) at the bottom.
+3. Tap **Add to Home Screen** → **Add**.
+4. Open **CycleFlow** from your home screen.
+
+**Tip:** If you logged days in Safari before installing, use **Export** in the browser, then **Import + Merge** in the installed app.
+
+### Android (recommended: Chrome)
+
+1. Open the live URL in **Chrome**.
+2. Tap **Install now** if the app offers it, **or** menu **⋮** → **Install app** / **Add to Home screen**.
+3. Launch from your home screen.
+
+### Computer (Chrome / Edge)
+
+1. Open the live URL.
+2. Click **Install** in the address bar (or **Install now** inside the app).
+3. Pin the window for quick daily logging.
+
+Inside the app: expand **Install CycleFlow** (bottom sections) for status, **Copy install link**, and platform-specific steps.
 
 ---
 
@@ -30,7 +61,8 @@ Built for **PMDD**, **ADHD**, and days when logging feels impossible — v2.1 ad
 - **FlowDock** — bright `›` on the left edge only; tap to open Graph · 30 days · Log · Save Day (🗓️ 📅).
 - **FlowBar** — optional bottom save strip; off by default, show when you want one-thumb save.
 - **Data management** — delete by date range and data type; erase-all requires typing `DELETE` + a 3-second hold.
-- **Gentler UI** — clearer type, focus states, toasts instead of clutter.
+- **Easier install** — in-app install banner, one-tap install on Android, platform steps for iPhone.
+- **Virus symptom** — 🦠 added to the symptom ledger.
 
 Full narrative: [WHATS_NEW_v2.1.md](WHATS_NEW_v2.1.md)
 
@@ -39,26 +71,15 @@ Full narrative: [WHATS_NEW_v2.1.md](WHATS_NEW_v2.1.md)
 ## v2.0 highlights
 
 - **Rich symptom legend** — emoji ↔ labels everywhere (picker, timeline tags, map tooltips, export).
-- **New symptoms** — e.g. **Puffy Face**, **Blood Present**, plus full **ledger** in export.
-- **Export lines with `labels:`** — human-readable names beside emoji stacks for doctors & backups.
-- **Pattern Stream** — an endless, scrollable function graph where good days sit high and heavier symptom-load days sit low, with emoji markers plotted directly on the line.
-- **Simple by default, powerful on tap** — advanced signal rows and cycle hotspots live behind a compact **Pattern details** drawer.
-- **Correlation Lab** — optional before/after windows for a selected symptom, so users can test cascades such as dreams → sweats → pain → fog without cluttering the main view.
-- **Demo data** — load a representative sample dataset when the app is empty, useful for trying the analysis views before adding personal data.
-- **Daily affirmations** — thousands of combinations, **one fresh line per calendar day**.
-- **Themes** — Light / Dark / System, persisted.
-- **AI handoff** — copy a structured prompt for ChatGPT-style tools (optional).
-- **Import + merge** — move data between **Safari** and **Home Screen** contexts on iOS, or paste a plain-text exported timeline to rebuild the local graph.
+- **Pattern Stream** — scrollable function graph with emoji markers on the line.
+- **Correlation Lab** — optional before/after windows for a selected symptom.
+- **Demo data**, **daily affirmations**, **themes**, **AI handoff**, **import + merge**.
 
 ---
 
 ## SEO / discoverability (GitHub & search)
 
-If you **star** or **fork** this repo, also add GitHub **Topics** so others find it:
-
-`cycle-tracker` · `symptom-tracker` · `pwa` · `period-tracker` · `women-health` · `pmdd` · `perimenopause` · `adhd` · `react` · `vite` · `health` · `open-source` · `free`
-
-**Deploying?** Set your production URL in social previews (Open Graph) if you customize `index.html`—see app `index.html` meta tags.
+GitHub **Topics:** `cycle-tracker` · `symptom-tracker` · `pwa` · `period-tracker` · `women-health` · `pmdd` · `perimenopause` · `adhd` · `react` · `vite` · `health` · `open-source` · `free`
 
 ---
 
@@ -67,12 +88,10 @@ If you **star** or **fork** this repo, also add GitHub **Topics** so others find
 | Path | Purpose |
 |------|---------|
 | `cycleflow/` | **Vite + React** app (deploy this folder on Vercel) |
+| `WHATS_NEW_v2.1.md` | Release notes for partners & testers |
 | `CycleFlow_Plan.md` | Planning notes |
-| `Phase7_Test_Report.md` | Test report |
 
-**License:** [MIT](LICENSE) — free to use and share; attribution appreciated.
-
-**Author / brand:** **N∞N**
+**License:** [MIT](LICENSE) · **Author:** **N∞N**
 
 ---
 
@@ -90,27 +109,15 @@ Phone on same Wi-Fi:
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
-## Production build
-
-```bash
-cd cycleflow
-npm run build
-npm run preview
-```
-
 ## Deploy (Vercel)
 
-- **Framework:** Vite  
-- **Root Directory:** `cycleflow`  
-- **Build:** `npm run build`  
-- **Output:** `dist`  
-- **Install:** `npm install`
+| Setting | Value |
+|--------|--------|
+| Root Directory | `cycleflow` |
+| Build | `npm run build` |
+| Output | `dist` |
 
-## iPhone install (no App Store)
-
-1. Open your deployed **HTTPS** URL in **Safari**.  
-2. **Share** → **Add to Home Screen**.  
-3. Launch from the icon.
+---
 
 ## Data migration (Safari vs Home Screen on iOS)
 
@@ -120,14 +127,11 @@ Storage can differ between Safari and the installed PWA. Use **Export** → copy
 
 ## Roadmap (post–v2.1 ideas)
 
-- Optional **cloud sync** (opt-in) if an official app store build happens.  
-- **Notifications** / reminders (native or web push).  
-- **PDF** or **CSV** export.  
-- Optional **doctor/clinician report** view generated from the Pattern Stream and correlation windows.
-- **Accessibility** audit pass & WCAG tweaks.  
-- **Localization** (i18n).  
-- **Wearables** or Apple Health (only with explicit consent).
+- Optional **app store** build (SDK) after real-world testing.
+- **Notifications** / reminders.
+- **PDF** or **CSV** export.
+- **Accessibility** audit & **localization**.
 
 ---
 
-**CycleFlow v2.1** · **N∞N** · MIT · built to stay **free** for anyone who needs it.
+**CycleFlow v2.1.1** · **N∞N** · MIT · built to stay **free** for anyone who needs it.
